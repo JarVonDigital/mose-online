@@ -103,6 +103,16 @@
             ],
             "scripts": []
           }
+        },
+        "deploy": {
+          "builder": "@angular/fire:deploy",
+          "options": {
+            "prerender": false,
+            "ssr": false,
+            "browserTarget": "MoseOnline:build:production",
+            "firebaseProject": "mosesubtitles",
+            "firebaseHostingSite": "mosesubtitles"
+          }
         }
       }
     }

@@ -1,0 +1,34 @@
+
+<div class="selector" *ngIf="subtitles">
+  <li *ngFor="let subtitle of subtitles"
+      (click)="onSelectSubtitleWorkingFile(subtitle)">
+    {{subtitle.title}}
+  </li>
+</div>
+
+<div class="editor">
+
+  <div class="top-section">
+    <button>English <small>(READ ONLY)</small></button>
+    <button>Spanish</button>
+  </div>
+
+
+   <div class="internal-editor" *ngIf="workingFile">
+     <div class="subtitle-section" *ngFor="let subtitle of workingFile.subtitles">
+       <div class="subtitle">
+         <div class="header">{{subtitle.sTimeFormatted}} <small>(READ ONLY)</small></div>
+         <div class="data">
+           {{subtitle.utterance}}
+         </div>
+       </div>
+       <div class="subtitle">
+         <div class="header">{{subtitle.sTimeFormatted}}</div>
+         <div class="data">
+           <textarea [(ngModel)]="subtitle.languages.es"></textarea>
+         </div>
+       </div>
+     </div>
+   </div>
+
+</div>

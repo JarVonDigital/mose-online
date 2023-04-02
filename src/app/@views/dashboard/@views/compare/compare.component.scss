@@ -1,0 +1,103 @@
+:host {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  font-family: 'Varela Round', sans-serif;
+
+  .selector {
+    width: 250px;
+
+    li {
+      list-style: none;
+      padding: 5px;
+      border: 2px solid #ab684c;
+      border-left-width: 4px;
+      margin: 10px;
+      cursor: pointer;
+    }
+  }
+
+  .editor {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+
+    .top-section {
+      top: 0;
+      position: sticky;
+      position: -webkit-sticky;
+      display: flex;
+      height: 35px;
+      border-bottom: 2px solid #774d41;
+
+      button {
+        flex: 1;
+        margin: 0;
+        padding: 0;
+        font-family: inherit;
+        background-color: white;
+        border: none;
+      }
+    }
+
+    .internal-editor {
+      flex: 1;
+      height: 100%;
+      overflow: auto;
+
+      .subtitle-section {
+        display: flex;
+
+        .subtitle {
+          flex: 1;
+          border: 2px solid grey;
+          border-top: none;
+          height: 100px;
+          overflow: hidden;
+
+          &:first-of-type {background-color: white;
+            border-right-width: 1px;
+            border-left: none;
+
+            .data {
+              color: rgb(100, 100, 100);
+              cursor: default;
+            }
+          }
+
+          &:last-of-type {
+            border-left-width: 1px;
+            border-right: none;
+          }
+
+          .header {
+            font-size: 13px;
+            font-weight: 700;
+            padding: 5px;
+            background-color: rgb(220, 220, 220);
+          }
+
+          .data {
+            height: inherit;
+            font-size: 18px;
+            padding: 5px;
+
+            textarea {
+              resize: none;
+              height: 100%;
+              width: 100%;
+              border: none;
+              outline: none;
+              margin: 0;
+              padding: 0;
+              font-family: inherit;
+              font-size: inherit;
+              color: inherit;
+            }
+          }
+        }
+      }
+    }
+  }
+}

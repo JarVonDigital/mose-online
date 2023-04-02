@@ -1,0 +1,41 @@
+:host {
+  width: 100%;
+
+  .downloads {
+    display: flex;
+    flex-direction: row;
+    font-family: 'Nanum Myeongjo', serif;
+
+    li {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      list-style: none;
+      align-items: center;
+      justify-content: center;
+      max-width: 200px;
+      margin: 20px;
+
+      .icon {
+        height: 50px;
+        width: 50px;
+        margin: 10px 0;
+
+        img {
+          display: block;
+          height: inherit;
+        }
+      }
+
+      a {
+        width: 100%;
+
+        button {
+          width: 100%;
+          font-family: inherit;
+          margin: 10px 0;
+        }
+      }
+    }
+  }
+}

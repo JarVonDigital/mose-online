@@ -1,0 +1,94 @@
+:host {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 400px;
+    width: 500px;
+    background-color: #ab684c;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px -5px;
+
+    .title {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Nanum Myeongjo', serif;
+      font-size: 50px;
+      color: white;
+      margin: 20px 0;
+
+      small {
+        font-size: 20px;
+        color: #85442c;
+        font-family: 'Varela Round', sans-serif;
+      }
+    }
+
+    .form-field {
+      display: flex;
+      background-color: #774d41;
+      color: white;
+      border-radius: 15px;
+      align-items: center;
+      width: 100%;
+      min-width: 300px;
+      max-width: 300px;
+      margin: 15px 0;
+      font-family: 'Varela Round', sans-serif;
+
+      .icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 50px;
+        width: 50px;
+
+        img {
+          display: block;
+          height: 25px;
+        }
+      }
+
+      input {
+        flex: 1;
+        font-family: inherit;
+        border-radius: 0;
+        border: none;
+        background-color: transparent;
+        outline: none;
+        color: white;
+        width: 100%;
+        height: 100%;
+
+        &::placeholder {
+          color: rgb(150, 150, 150);
+          font-weight: 600;
+        }
+      }
+    }
+
+    .buttons {
+      font-family: 'Varela Round', sans-serif;
+      margin-top: 15px;
+
+      button {
+        width: 200px;
+        border: none;
+        font-family: inherit;
+        font-size: 15px;
+        padding: 10px;
+        border-radius: 20px;
+        background-color: #85442c;
+        color: white;
+        font-weight: 600;
+      }
+    }
+  }
+}

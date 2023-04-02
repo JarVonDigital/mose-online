@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "mosesubtitles": {
+      "hosting": {
+        "MoseOnline": [
+          "mosesubtitles"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "mosesubtitles"
+  }
+}
