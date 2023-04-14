@@ -20,9 +20,9 @@ export class AuthComponent implements OnInit {
 
   loginForm!: FormGroup<LoginForm>;
 
-  constructor() { }
-
   ngOnInit(): void {
+
+    window.addEventListener("keyup", (ev) => (ev.key === "Enter" && this.loginForm.valid) ? this.onLogin() : null)
 
     // Set Login form
     this.loginForm = new FormGroup<LoginForm>({

@@ -13,6 +13,7 @@ import { provideFirestore,getFirestore } from '@angular/fire/firestore';
 import { DashboardComponent } from './@views/dashboard/dashboard.component';
 import { SidebarComponent } from './@views/dashboard/@elements/sidebar/sidebar.component';
 import { FilesComponent } from './@views/dashboard/@views/files/files.component';
+import {HttpClientModule} from "@angular/common/http";
 
 @NgModule({
   declarations: [
@@ -27,6 +28,7 @@ import { FilesComponent } from './@views/dashboard/@views/files/files.component'
     BrowserModule,
     AppRoutingModule,
     FormsModule,
+    HttpClientModule,
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideAuth(() => getAuth()),
     provideFirestore(() => getFirestore()),

@@ -86,8 +86,14 @@
         padding: 10px;
         border-radius: 20px;
         background-color: #85442c;
+        box-shadow: 2px 2px 0 rgb(150, 150, 150);
         color: white;
         font-weight: 600;
+        cursor: pointer;
+
+        &[disabled] {
+          background-color: grey;
+        }
       }
     }
   }

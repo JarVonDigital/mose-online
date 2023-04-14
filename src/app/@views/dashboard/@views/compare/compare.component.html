@@ -8,13 +8,24 @@
 
 <div class="editor">
 
-  <div class="top-section">
-    <button>English <small>(READ ONLY)</small></button>
-    <button>Spanish</button>
+  <div class="top-section" *ngIf="workingFile">
+    <div class="info">
+      <h2>{{this.workingFile.title}} <small *ngIf="this.updatingNumber > 0">| {{this.updatingNumber}} / {{this.workingFile.subtitles.length - 1}}</small></h2>
+      <div class="buttons">
+        <button (click)="translateAllText()"><img src="https://img.icons8.com/material/96/null/google-translate.png"/></button>
+        <button (click)="saveFile()"><img src="https://img.icons8.com/material/96/null/save-all--v2.png"/></button>
+        <button class="autosave" (click)="toggleAutoSave()">AutoSave<small [ngClass]="{'active': isAutoSaving, 'inactive': !isAutoSaving}">{{isAutoSaving ? 'Active' : 'Inactive'}}</small></button>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button>English <small>(READ ONLY)</small></button>
+      <button>Spanish</button>
+    </div>
+
   </div>
 
-
-   <div class="internal-editor" *ngIf="workingFile">
+  <div class="internal-editor" *ngIf="workingFile">
      <div class="subtitle-section" *ngFor="let subtitle of workingFile.subtitles">
        <div class="subtitle">
          <div class="header">{{subtitle.sTimeFormatted}} <small>(READ ONLY)</small></div>
@@ -31,6 +42,10 @@
      </div>
    </div>
 
+  <div class="no-file-selected" *ngIf="!workingFile">
+    <img src="https://img.icons8.com/material/96/null/block-chain.png"/>
+    <h3>Please select a file...</h3>
+  </div>
 </div>
 
 <div class="replacer">

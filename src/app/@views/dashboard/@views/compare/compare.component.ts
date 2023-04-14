@@ -1,6 +1,7 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {SubtitlesService} from "../../../../@services/subtitles/subtitles.service";
 import {doc, Firestore, updateDoc} from "@angular/fire/firestore";
+import {HttpClient} from "@angular/common/http";
 
 interface replacer {
   search: string[],
@@ -16,6 +17,7 @@ export class CompareComponent implements OnInit, OnDestroy {
 
   private firestore: Firestore = inject(Firestore);
   private subtitleService: SubtitlesService = inject(SubtitlesService);
+  private http: HttpClient = inject(HttpClient);
   workingFile: any;
   subtitles: any;
 
@@ -26,25 +28,21 @@ export class CompareComponent implements OnInit, OnDestroy {
   replacers: replacer[] = [
     {search: [], replacers: []}
   ];
+  public updatingNumber: number = 0;
+  public isAutoSaving: boolean = true;
 
   async ngOnInit(): Promise<void> {
 
     this.subtitles = await this.subtitleService.getAllSubtitles();
     this.replacers = await this.subtitleService.getAllReplacers();
 
-    setInterval(async () => {
-      if (this.workingFile) {
-        await this.saveFile()
-      } else {
-        console.log('Autosave Pending Document. Will try again in 10 seconds.')
-      }
+    if(this.isAutoSaving) { this.enableAutoSave() }
 
-    }, 10000)
 
   }
 
   ngOnDestroy() {
-    clearInterval(this.autoSave);
+    this.disableAutoSave()
   }
 
   onSelectSubtitleWorkingFile(file: any) {
@@ -114,5 +112,60 @@ export class CompareComponent implements OnInit, OnDestroy {
       await this.saveFile()
 
     }
+  }
+
+  async translateAllText() {
+    if(!window.confirm("Are you sure you want to translate English to Spanish?")) return;
+    this.updatingNumber = 1;
+    for (const subtitle of this.workingFile.subtitles) {
+      const translation = await this.http.post<any>(`http://103-89-12-225.cloud-xip.com:5000/translate`,
+        {
+          q: subtitle.utterance,
+          source: 'en',
+          target: 'es',
+          format: 'text',
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          api_key: ''
+        },
+        {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          headers: {'Content-Type': 'application/json'}
+        }).toPromise();
+
+      subtitle.languages.es = translation.translatedText;
+      this.updatingNumber++;
+    }
+
+    await this.saveFile();
+    window.alert(`Translation Complete: ${this.updatingNumber}/${this.workingFile.subtitles.length - 1}`);
+    this.updatingNumber = 0;
+  }
+
+  toggleAutoSave() {
+    if(this.isAutoSaving) {
+      if(window.confirm("Are you sure you want to disable AutoSave?")) {
+        this.isAutoSaving = false;
+        this.disableAutoSave();
+      }
+    } else {
+      this.isAutoSaving = true;
+      this.enableAutoSave();
+    }
+  }
+
+  private disableAutoSave() {
+    clearInterval(this.autoSave);
+  }
+
+  private enableAutoSave() {
+    console.log("Enabling AutoSave...")
+    this.autoSave = setInterval(async () => {
+      if (this.workingFile) {
+        await this.saveFile()
+      } else {
+        console.log('Autosave Pending Document. Will try again in 10 seconds.')
+      }
+
+    }, 10000)
   }
 }

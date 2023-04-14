@@ -21,6 +21,7 @@
   .editor {
     display: flex;
     flex-direction: column;
+    background-color: rgb(250, 250, 250);
     flex: 1;
 
     .top-section {
@@ -28,17 +29,79 @@
       position: sticky;
       position: -webkit-sticky;
       display: flex;
-      height: 35px;
+      flex-direction: column;
       border-bottom: 2px solid #774d41;
+      background-color: white;
 
-      button {
+      .info {
+        display: flex;
         flex: 1;
-        margin: 0;
-        padding: 0;
-        font-family: inherit;
-        background-color: white;
-        border: none;
+
+        h2 {
+          flex: 1;
+          font-size: 20px;
+          margin: 10px;
+        }
+
+        .buttons {
+          display: flex;
+          width: 300px;
+
+          button {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            border-bottom: 2px solid rgb(240, 240, 240);
+            background-color: transparent;
+            cursor: pointer;
+            font-family: inherit;
+
+            &.autosave {
+              display: block;
+              small {
+                display: block;
+
+                &.active {
+                  color: green;
+                }
+
+                &.inactive {
+                  color: red;
+                }
+              }
+            }
+
+            img {
+              display: block;
+              height: 25px;
+            }
+
+            &:hover {
+              opacity: .7;
+            }
+          }
+        }
       }
+
+      .tabs {
+        flex: 1;
+        display: flex;
+        height: 35px;
+        padding: 10px 0;
+
+        button {
+          flex: 1;
+          margin: 0;
+          padding: 0;
+          font-family: inherit;
+          background-color: white;
+          border: none;
+        }
+      }
+
+
     }
 
     .internal-editor {
@@ -97,6 +160,23 @@
             }
           }
         }
+      }
+    }
+
+    .no-file-selected {
+      display: flex;
+      height: 100%;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+
+      img {
+        height: 50px;
+        width: 50px;
+      }
+
+      h3 {
+        color: rgb(80, 80, 80);
       }
     }
   }

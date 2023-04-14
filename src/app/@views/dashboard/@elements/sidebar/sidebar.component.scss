@@ -43,10 +43,15 @@
       background-color: rgba(50, 50, 50, .3);
       border-radius: 10px;
       transform: scale(.8);
+      cursor: pointer;
 
       img {
         display: block;
         height: 35px;
+      }
+
+      &:hover {
+        opacity: .7;
       }
     }
   }

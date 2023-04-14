@@ -14,6 +14,7 @@ const routes: Routes = [
     component: DashboardComponent,
     canActivate: [AuthGuard],
     children: [
+      { path: '', pathMatch: 'full', redirectTo: 'view/compare'},
       {
         path: "view/compare",
         component: CompareComponent
