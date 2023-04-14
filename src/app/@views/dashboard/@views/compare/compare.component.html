@@ -32,3 +32,39 @@
    </div>
 
 </div>
+
+<div class="replacer">
+
+  <div class="header">
+    <button (click)="replaceAllText()">Replace All Text</button>
+  </div>
+
+  <div class="replacer-form">
+    <div class="fields">
+      <div class="left">
+        <input type="text" placeholder="search" [(ngModel)]="searchString">
+      </div>
+      <div class="right">
+        <input type="text" placeholder="replace" [(ngModel)]="replacerString">
+      </div>
+    </div>
+    <div class="bottom">
+      <button (click)="addReplacement()">Add Replacement</button>
+    </div>
+  </div>
+
+  <div class="replacer-form" *ngFor="let replacer of replacers; let i = index">
+    <div class="fields">
+      <div class="left">
+        <input type="text" placeholder="search" [(ngModel)]="replacer.search[0]">
+      </div>
+      <div class="right">
+        <input type="text" placeholder="replace" [(ngModel)]="replacer.replacers[0]">
+      </div>
+    </div>
+    <div class="bottom">
+      <button class="delete" (click)="removeReplacer(i)">Delete</button>
+    </div>
+  </div>
+
+</div>
