@@ -1,7 +1,7 @@
 
 <div class="header">M<small>S</small></div>
 
-<div class="menu-items">
+<div class="menu-items" *ngIf="user">
   <li [routerLink]="['view','users']" *ngIf="user.roles.isDev || user.roles.isLead">
     <img src="https://img.icons8.com/material/96/ffffff/conference-call--v2.png"/>
   </li>

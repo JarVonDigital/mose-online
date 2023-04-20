@@ -14,13 +14,14 @@ export class AuthService {
 
   private _loginCreds = {};
 
-  async getLoginUser() {
-    let creds: User | null = getAuth().currentUser
-    let modifyDocLocation = doc(this.firestore, `users/${creds?.email}`);
+  async getLoginUser(creds?: any) {
+    creds = creds ? creds.user : getAuth().currentUser;
+
+    let modifyDocLocation = doc(this.firestore, `users`, `${creds?.email}`);
     let document = await getDoc(modifyDocLocation)
-    let userData = {}
+
     if (document.exists()) {
-      this._loginCreds = document.data()
+      this._loginCreds = document.data()!
     } else {
       let firstName = window.prompt("This is your first time logging in, please enter your first name");
       let lastName = window.prompt("This is your first time logging in, please enter your last name")
@@ -36,7 +37,7 @@ export class AuthService {
           }
         };
 
-        await setDoc(modifyDocLocation, userData)
+        await setDoc(modifyDocLocation, this.loginCreds)
 
       } else {
         window.alert("You'll need to add a first and last name next time you login")

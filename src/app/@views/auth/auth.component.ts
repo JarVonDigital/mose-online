@@ -45,9 +45,9 @@ export class AuthComponent implements OnInit {
     )
 
     if(creds) {
-      await this.authService.getLoginUser();
+      await this.authService.getLoginUser(creds);
+      await this.router.navigate(['dashboard'])
     }
-    await this.router.navigate(['dashboard'])
 
   }
 
