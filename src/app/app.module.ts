@@ -14,6 +14,7 @@ import { DashboardComponent } from './@views/dashboard/dashboard.component';
 import { SidebarComponent } from './@views/dashboard/@elements/sidebar/sidebar.component';
 import { FilesComponent } from './@views/dashboard/@views/files/files.component';
 import {HttpClientModule} from "@angular/common/http";
+import { UsersComponent } from './@views/dashboard/@views/users/users.component';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import {HttpClientModule} from "@angular/common/http";
     CompareComponent,
     DashboardComponent,
     SidebarComponent,
-    FilesComponent
+    FilesComponent,
+    UsersComponent
   ],
   imports: [
     BrowserModule,

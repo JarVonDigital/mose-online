@@ -5,6 +5,8 @@ import {CompareComponent} from "./@views/dashboard/@views/compare/compare.compon
 import {AuthGuard} from "./@guards/auth/auth.guard";
 import {DashboardComponent} from "./@views/dashboard/dashboard.component";
 import {FilesComponent} from "./@views/dashboard/@views/files/files.component";
+import {UserResolver} from "./@resolvers/user/user.resolver";
+import {UsersComponent} from "./@views/dashboard/@views/users/users.component";
 
 const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login'},
@@ -13,8 +15,13 @@ const routes: Routes = [
     path: 'dashboard',
     component: DashboardComponent,
     canActivate: [AuthGuard],
+    resolve: [UserResolver],
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'view/compare'},
+      {
+        path: "view/users",
+        component: UsersComponent
+      },
       {
         path: "view/compare",
         component: CompareComponent

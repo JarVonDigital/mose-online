@@ -2,6 +2,7 @@ import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {SubtitlesService} from "../../../../@services/subtitles/subtitles.service";
 import {doc, Firestore, updateDoc} from "@angular/fire/firestore";
 import {HttpClient} from "@angular/common/http";
+import {AuthService} from "../../../../@services/auth/auth.service";
 
 interface replacer {
   search: string[],
@@ -18,6 +19,11 @@ export class CompareComponent implements OnInit, OnDestroy {
   private firestore: Firestore = inject(Firestore);
   private subtitleService: SubtitlesService = inject(SubtitlesService);
   private http: HttpClient = inject(HttpClient);
+  private authService = inject(AuthService);
+
+  user: any | null;
+  users: any[] | undefined;
+
   workingFile: any;
   subtitles: any;
 
@@ -33,11 +39,12 @@ export class CompareComponent implements OnInit, OnDestroy {
 
   async ngOnInit(): Promise<void> {
 
+    this.user = this.authService.loginCreds;
     this.subtitles = await this.subtitleService.getAllSubtitles();
     this.replacers = await this.subtitleService.getAllReplacers();
+    this.users = await this.authService.getUsers()
 
     if(this.isAutoSaving) { this.enableAutoSave() }
-
 
   }
 
@@ -46,6 +53,7 @@ export class CompareComponent implements OnInit, OnDestroy {
   }
 
   onSelectSubtitleWorkingFile(file: any) {
+    file.isLocked = (file.isLocked === undefined) ? false : file.isLocked;
     this.workingFile = file;
   }
 
@@ -167,5 +175,38 @@ export class CompareComponent implements OnInit, OnDestroy {
       }
 
     }, 10000)
+  }
+
+  async onLockFile() {
+    let confirm = window.confirm("Are you sure you want to lock this file and mark as completed?")
+
+    if(confirm) {
+      let input = window.prompt("Please enter your name (First and Last) to mark as completed");
+
+      if(input) {
+        if(input?.toUpperCase() === (this.user.firstName.toUpperCase() +" "+ this.user.lastName.toUpperCase())) {
+          this.workingFile.isLocked = true;
+          await this.saveFile()
+          window.alert("This file has been successfully locked!")
+        } else {
+          window.alert("The name entered does not match, please try again or ask your lead for assistance.")
+        }
+      }
+
+    }
+  }
+
+  async onUnlockFile() {
+    if(this.workingFile.isLocked) {
+      let confirm = window.confirm("Are you sure you want to unlock? This files completion status will be reset.")
+      if(confirm) {
+        this.workingFile.isLocked = false;
+        await this.saveFile()
+      }
+    }
+  }
+
+  async onAssignedSelectChange() {
+    await this.saveFile()
   }
 }

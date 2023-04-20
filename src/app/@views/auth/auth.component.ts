@@ -1,7 +1,9 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {FormControl, FormGroup, Validators} from "@angular/forms";
-import {Auth, signInWithEmailAndPassword} from "@angular/fire/auth";
+import {Auth, signInWithEmailAndPassword, UserCredential} from "@angular/fire/auth";
 import {Router} from "@angular/router";
+import {doc, Firestore, getDoc, setDoc, updateDoc} from "@angular/fire/firestore";
+import {AuthService} from "../../@services/auth/auth.service";
 
 interface LoginForm {
   email: FormControl<string>;
@@ -17,6 +19,7 @@ export class AuthComponent implements OnInit {
 
   private auth = inject(Auth)
   private router = inject(Router);
+  private authService = inject(AuthService)
 
   loginForm!: FormGroup<LoginForm>;
 
@@ -32,17 +35,20 @@ export class AuthComponent implements OnInit {
 
   }
 
-  onLogin() {
+  async onLogin() {
 
     // Login User
-    signInWithEmailAndPassword(
+    let creds: UserCredential = await signInWithEmailAndPassword(
       this.auth,
       this.loginForm.get("email")?.getRawValue(),
       this.loginForm.get("password")?.getRawValue()
-    ).then(user => {
-        this.router.navigate(['dashboard'])
-          .then(() => {})
-    }).catch(err => console.log(err));
+    )
+
+    if(creds) {
+      await this.authService.getLoginUser();
+    }
+    await this.router.navigate(['dashboard'])
 
   }
+
 }
