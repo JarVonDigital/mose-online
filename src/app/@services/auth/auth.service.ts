@@ -26,7 +26,7 @@ export class AuthService {
       let firstName = window.prompt("This is your first time logging in, please enter your first name");
       let lastName = window.prompt("This is your first time logging in, please enter your last name")
 
-      if (firstName && lastName) {
+      if (firstName?.trim() && lastName?.trim()) {
         this._loginCreds = {
           firstName: firstName,
           lastName: lastName,
