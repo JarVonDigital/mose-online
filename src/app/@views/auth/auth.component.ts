@@ -37,7 +37,7 @@ export class AuthComponent implements OnInit {
 
   async onLogin() {
 
-    // Login User
+    // Login MoseUser
     let creds: UserCredential = await signInWithEmailAndPassword(
       this.auth,
       this.loginForm.get("email")?.getRawValue(),

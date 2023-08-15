@@ -11,15 +11,30 @@
 
     li {
       list-style: none;
-      padding: 5px;
       border: 2px solid #ab684c;
       border-left-width: 4px;
       margin: 10px;
+      padding-top: 5px;
       cursor: pointer;
+      text-indent: 5px;
 
       small {
         display: block;
         font-size: 11px;
+      }
+
+      select {
+        border: 0;
+        padding: 2.5px;
+        margin: 10px 0 0 0;
+        background: rgb(240, 240, 240);
+        outline: none;
+        border-radius: 0;
+        cursor: pointer;
+        font-family: inherit;
+        width: 100%;
+        font-weight: 600;
+        font-size: 12px;
       }
 
       &.disabled {
@@ -57,6 +72,7 @@
 
         .actions {
           display: flex;
+          flex: 1;
           align-items: center;
           justify-content: center;
 
@@ -75,7 +91,6 @@
             select {
               flex: 1;
               padding: 5px;
-              width: 225px;
               border: 1px solid rgb(230, 230, 230);
               border-bottom: none;
               font-family: inherit;

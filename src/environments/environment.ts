@@ -12,7 +12,8 @@ export const environment = {
     messagingSenderId: '624483313128',
     measurementId: 'G-6GPRTX142H',
   },
-  production: false
+  production: false,
+  OPENAI_API_KEY: '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'
 };
 
 /*

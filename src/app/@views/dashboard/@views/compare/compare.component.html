@@ -1,11 +1,21 @@
 
 <div class="selector" *ngIf="subtitles && user">
+  <li *ngIf="user.roles.isDev" (click)="onGetTrainingData()">Get Training Data</li>
   <li *ngFor="let subtitle of subtitles"
       (click)="onSelectSubtitleWorkingFile(subtitle)"
-      [class]="{'disabled': (!user.roles.isDev && !user.roles.isLead && subtitle.assignedTo != user.email)}">
+      [class]="{'disabled': ((!user.roles.isDev && !user.roles.isLead) && subtitle.assignedTo != user.email)}">
     {{subtitle.title}}
     <small *ngIf="subtitle.assignedTo">{{subtitle.assignedTo}}</small>
     <small *ngIf="!subtitle.assignedTo">Unassigned</small>
+    <select [disabled]="(!user.roles.isDev || !user.roles.isLead)" [(ngModel)]="subtitle.taskStatus" (change)="saveFile()">
+      <option>Select Status</option>
+      <option value="0">Not Started</option>
+      <option value="1">English Translation Pending</option>
+      <option value="2">English Translation Complete</option>
+      <option value="3">Spanish Translation Pending</option>
+      <option value="4">Spanish Translation Complete</option>
+      <option *ngIf="user.roles.isLead" value="5">Task Complete</option>
+    </select>
   </li>
 </div>
 
@@ -15,16 +25,29 @@
     <div class="info">
       <h2>{{this.workingFile.title}} <small *ngIf="this.updatingNumber > 0">| {{this.updatingNumber}} / {{this.workingFile.subtitles.length - 1}}</small></h2>
       <div class="actions">
-        <div class="action" *ngIf="user.roles.isDev || user.roles.isLead">
+        <div class="action" *ngIf="user?.roles?.isDev || user?.roles?.isLead">
           <label>Assigned</label>
           <select [(ngModel)]="workingFile.assignedTo" (change)="onAssignedSelectChange()">
             <option value="">Unassigned</option>
             <option *ngFor="let userData of users" [value]="userData.email">{{userData.firstName}} {{userData.lastName}}</option>
           </select>
         </div>
+        <div class="action">
+          <label>Status</label>
+          <select [(ngModel)]="workingFile.taskStatus" (change)="saveFile()">
+            <option>Select Status</option>
+            <option value="0">Not Started</option>
+            <option value="1">English Translation Pending</option>
+            <option value="2">English Translation Complete</option>
+            <option value="3">Spanish Translation Pending</option>
+            <option value="4">Spanish Translation Complete</option>
+            <option *ngIf="user?.roles?.isLead" value="5">Task Complete</option>
+          </select>
+        </div>
       </div>
       <div class="buttons">
-        <button (click)="onUnlockFile()" *ngIf="(user.roles.isDev || user.roles.isLead) && workingFile.isLocked"><img src="https://img.icons8.com/material/96/null/unlock-2.png"/></button>
+        <button *ngIf="user?.roles?.isDev" (click)="onSetTrainingData()"><img src="https://img.icons8.com/material/96/artificial-intelligence.png" alt="artificial-intelligence"/></button>
+        <button (click)="onUnlockFile()" *ngIf="(user?.roles?.isDev || user?.roles?.isLead) && workingFile.isLocked"><img src="https://img.icons8.com/material/96/null/unlock-2.png"/></button>
         <button (click)="onLockFile()" *ngIf="!workingFile.isLocked"><img src="https://img.icons8.com/material/96/null/lock-2--v1.png"/></button>
         <button (click)="translateAllText()" *ngIf="!workingFile.isLocked"><img src="https://img.icons8.com/material/96/null/google-translate.png"/></button>
         <button (click)="saveFile()"><img src="https://img.icons8.com/material/96/null/save-all--v2.png"/></button>
@@ -33,8 +56,8 @@
     </div>
 
     <div class="tabs">
-      <button>English <small>(READ ONLY)</small></button>
-      <button>Spanish</button>
+      <button>English <small *ngIf="user?.workingLanguage === 'es'">(READ ONLY)</small></button>
+      <button>Spanish <small *ngIf="user?.workingLanguage === 'en'">(READ ONLY)</small></button>
     </div>
 
   </div>
@@ -42,18 +65,24 @@
   <div class="internal-editor" *ngIf="workingFile">
      <div class="subtitle-section" *ngFor="let subtitle of workingFile.subtitles">
        <div class="subtitle">
-         <div class="header">{{subtitle.sTimeFormatted}} <small>(READ ONLY)</small></div>
-         <div class="data">
+         <div class="header">{{subtitle.sTimeFormatted}} <small *ngIf="user?.workingLanguage === 'es'">(READ ONLY)</small></div>
+         <div class="data" *ngIf="user?.workingLanguage === 'en' && !workingFile.isLocked">
+             <textarea spellcheck="false" [(ngModel)]="subtitle.utterance"></textarea>
+         </div>
+         <div class="data" *ngIf="user?.workingLanguage !== 'en' || workingFile.isLocked">
            {{subtitle.utterance}}
          </div>
        </div>
        <div class="subtitle">
-         <div class="header">{{subtitle.sTimeFormatted}}</div>
+         <div class="header">{{subtitle.sTimeFormatted}} <small *ngIf="user?.workingLanguage === 'es'">(READ ONLY)</small></div>
          <div class="data" *ngIf="workingFile.isLocked">
            {{subtitle.languages.es}}
          </div>
-         <div class="data" *ngIf="!workingFile.isLocked">
-           <textarea [(ngModel)]="subtitle.languages.es"></textarea>
+         <div class="data" *ngIf="!workingFile.isLocked && user?.workingLanguage === 'es'">
+           <textarea spellcheck="false" [(ngModel)]="subtitle.languages.es"></textarea>
+         </div>
+         <div class="data" *ngIf="user?.workingLanguage !== 'es' || workingFile.isLocked">
+           {{subtitle.utterance}}
          </div>
        </div>
      </div>

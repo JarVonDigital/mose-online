@@ -3,6 +3,9 @@ import {SubtitlesService} from "../../../../@services/subtitles/subtitles.servic
 import {doc, Firestore, updateDoc} from "@angular/fire/firestore";
 import {HttpClient} from "@angular/common/http";
 import {AuthService} from "../../../../@services/auth/auth.service";
+import {firstValueFrom} from "rxjs";
+import {environment} from "../../../../../environments/environment";
+import {MoseUser} from "../../../../@interfaces/user/mose-user";
 
 interface replacer {
   search: string[],
@@ -21,8 +24,8 @@ export class CompareComponent implements OnInit, OnDestroy {
   private http: HttpClient = inject(HttpClient);
   private authService = inject(AuthService);
 
-  user: any | null;
-  users: any[] | undefined;
+  user: MoseUser | undefined;
+  users: MoseUser[] | undefined;
 
   workingFile: any;
   subtitles: any;
@@ -36,6 +39,8 @@ export class CompareComponent implements OnInit, OnDestroy {
   ];
   public updatingNumber: number = 0;
   public isAutoSaving: boolean = true;
+  public trainingData: any[] = [];
+  public trainingDataIncluded: any[] = [];
 
   async ngOnInit(): Promise<void> {
 
@@ -55,6 +60,32 @@ export class CompareComponent implements OnInit, OnDestroy {
   onSelectSubtitleWorkingFile(file: any) {
     file.isLocked = (file.isLocked === undefined) ? false : file.isLocked;
     this.workingFile = file;
+
+    if(this.user?.roles.isDev) {
+      this.onSetTrainingData();
+    }
+  }
+
+  onSetTrainingData() {
+
+    // Hard Stop if we've already included said file
+    if(this.trainingDataIncluded.includes(this.workingFile.title)) return;
+
+    // DEV: Create a JSON Version for training\
+    for(let sub of this.workingFile.subtitles) {
+      this.trainingData.push({
+        prompt: sub.utterance + ";;",
+        completion: sub.languages.es + ";;"
+      })
+    }
+
+    this.trainingDataIncluded.push(this.workingFile.title);
+    console.log(`Set Complete: ${this.workingFile.title}`)
+
+  }
+
+  onGetTrainingData() {
+    console.log(this.trainingData);
   }
 
   async saveFile() {
@@ -126,21 +157,24 @@ export class CompareComponent implements OnInit, OnDestroy {
     if(!window.confirm("Are you sure you want to translate English to Spanish?")) return;
     this.updatingNumber = 1;
     for (const subtitle of this.workingFile.subtitles) {
-      const translation = await this.http.post<any>(`http://103-89-12-225.cloud-xip.com:5000/translate`,
+      const translation = await firstValueFrom(
+        this.http.post<any>(`https://api.openai.com/v1/completions`,
         {
-          q: subtitle.utterance,
-          source: 'en',
-          target: 'es',
-          format: 'text',
-          // eslint-disable-next-line @typescript-eslint/naming-convention
-          api_key: ''
+          model: 'curie:ft-jarvondigital:mose-translate-2023-08-14-00-31-43',
+          prompt: `${subtitle.utterance};;`,
+          temperature: 0,
+          max_tokens: 256,
+          stop: ';;'
         },
         {
-          // eslint-disable-next-line @typescript-eslint/naming-convention
-          headers: {'Content-Type': 'application/json'}
-        }).toPromise();
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${environment.OPENAI_API_KEY}`
+          }
+        })
+      );
 
-      subtitle.languages.es = translation.translatedText;
+      subtitle.languages.es = translation.choices[0].text.trim();
       this.updatingNumber++;
     }
 
@@ -184,7 +218,7 @@ export class CompareComponent implements OnInit, OnDestroy {
       let input = window.prompt("Please enter your name (First and Last) to mark as completed");
 
       if(input) {
-        if(input?.toUpperCase() === (this.user.firstName.toUpperCase() +" "+ this.user.lastName.toUpperCase())) {
+        if(input?.toUpperCase() === (this.user?.firstName.toUpperCase() +" "+ this.user?.lastName.toUpperCase())) {
           this.workingFile.isLocked = true;
           await this.saveFile()
           window.alert("This file has been successfully locked!")
