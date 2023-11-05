@@ -261,7 +261,7 @@ export class CompareComponent implements OnInit, OnDestroy {
   private onGetLastScrollPositionOfDocument() {
     let editor = document.getElementById("editor") as HTMLElement;
 
-    if(editor) {
+    if(editor && this.user) {
       if(!this.workingFile.scrollLock) {
         this.workingFile.scrollLock = {}
       }
