@@ -55,10 +55,12 @@ export class CompareComponent implements OnInit, OnDestroy {
   onSelectSubtitleWorkingFile(file: any) {
     file.isLocked = (file.isLocked === undefined) ? false : file.isLocked;
     this.workingFile = file;
+    this.onGetLastScrollPositionOfDocument()
   }
 
   async saveFile() {
     try {
+      this.onSaveLastScrollPositionToDocument();
       await updateDoc(doc(this.firestore, `subtitles`, this.workingFile.title), this.workingFile);
     } catch(err) {
       console.log(err)
@@ -208,5 +210,29 @@ export class CompareComponent implements OnInit, OnDestroy {
 
   async onAssignedSelectChange() {
     await this.saveFile()
+  }
+
+  private onSaveLastScrollPositionToDocument() {
+
+    let editor = document.getElementById("editor") as HTMLElement;
+
+    if(this.user) {
+      if(editor) {
+        if(!this.workingFile.scrollLock) { this.workingFile.scrollLock = {}; }
+        this.workingFile.scrollLock[this.user.email] = editor.scrollTop;
+      }
+    }
+  }
+
+  private onGetLastScrollPositionOfDocument() {
+    let editor = document.getElementById("editor") as HTMLElement;
+
+    if(editor) {
+      if(!this.workingFile.scrollLock) {
+        this.workingFile.scrollLock = {}
+      }
+      editor.scrollTop = (this.workingFile.scrollLock[this.user.email] as number) || 0;
+    }
+
   }
 }

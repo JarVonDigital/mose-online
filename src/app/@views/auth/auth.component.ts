@@ -2,7 +2,6 @@ import {Component, inject, OnInit} from '@angular/core';
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {Auth, signInWithEmailAndPassword, UserCredential} from "@angular/fire/auth";
 import {Router} from "@angular/router";
-import {doc, Firestore, getDoc, setDoc, updateDoc} from "@angular/fire/firestore";
 import {AuthService} from "../../@services/auth/auth.service";
 
 interface LoginForm {
@@ -37,16 +36,20 @@ export class AuthComponent implements OnInit {
 
   async onLogin() {
 
-    // Login User
-    let creds: UserCredential = await signInWithEmailAndPassword(
-      this.auth,
-      this.loginForm.get("email")?.getRawValue(),
-      this.loginForm.get("password")?.getRawValue()
-    )
+    try {
 
-    if(creds) {
+      // Login User
+      const creds : UserCredential = await signInWithEmailAndPassword(
+        this.auth,
+        this.loginForm.getRawValue().email.toLowerCase(),
+        this.loginForm.getRawValue().password
+      )
+
       await this.authService.getLoginUser(creds);
       await this.router.navigate(['dashboard'])
+
+    } catch(err) {
+      console.log("There was an error while attempting to login");
     }
 
   }
