@@ -1,19 +1,20 @@
 import {inject, Injectable} from '@angular/core';
 import {collection, doc, Firestore, getDoc, getDocs, setDoc, updateDoc} from "@angular/fire/firestore";
-import {getAuth, User, user, UserCredential} from "@angular/fire/auth";
+import {getAuth} from "@angular/fire/auth";
+import {MoseUser} from "../../@interfaces/user/mose-user";
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  get loginCreds(): {} {
-    return this._loginCreds;
-  }
 
   private firestore = inject(Firestore);
 
-  private _loginCreds = {};
+  private _loginCreds: MoseUser = {email: "", firstName: "", lastName: "", roles: {isDev: false, isLead: false}};
 
+  get loginCreds() {
+    return this._loginCreds;
+  }
   async getLoginUser(creds?: any) {
     creds = creds ? creds.user : getAuth().currentUser;
 
@@ -21,7 +22,7 @@ export class AuthService {
     let document = await getDoc(modifyDocLocation)
 
     if (document.exists()) {
-      this._loginCreds = document.data()!
+      this._loginCreds = document.data()! as MoseUser
     } else {
       let firstName = window.prompt("This is your first time logging in, please enter your first name");
       let lastName = window.prompt("This is your first time logging in, please enter your last name")
@@ -50,12 +51,15 @@ export class AuthService {
 
   async getUsers() {
     let query = await getDocs(collection(this.firestore, "users"))
-    return query.docs.map(doc => doc.data());
+    return query.docs.map(doc => doc.data()) as MoseUser[];
   }
 
-  async onSaveUser(user: any) : Promise<boolean> {
+  async onSaveUser(user: MoseUser) : Promise<boolean> {
     try {
-      await updateDoc(doc(this.firestore, "users", user.email), user)
+      await updateDoc(
+        // @ts-ignore
+        doc(this.firestore, "users", user.email), user
+      )
       return true;
     } catch (err) {
       return false;
