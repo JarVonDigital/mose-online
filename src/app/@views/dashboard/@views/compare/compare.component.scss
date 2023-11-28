@@ -6,17 +6,19 @@
   font-family: 'Varela Round', sans-serif;
 
   .selector {
-    width: 250px;
+    width: 275px;
     overflow: auto;
+    background-color: #bbbbbb;
 
     li {
       list-style: none;
-      border: 2px solid #ab684c;
-      border-left-width: 4px;
+      background-color: white;
       margin: 10px;
       padding-top: 5px;
       cursor: pointer;
       text-indent: 5px;
+      border-radius: 5px;
+      overflow: hidden;
 
       small {
         display: block;
@@ -45,6 +47,10 @@
     }
   }
 
+  .view-area {
+    flex: 1;
+  }
+
   .editor {
     display: flex;
     flex-direction: column;
@@ -54,7 +60,6 @@
     .top-section {
       top: 0;
       position: sticky;
-      position: -webkit-sticky;
       display: flex;
       flex-direction: column;
       border-bottom: 2px solid #774d41;
@@ -117,6 +122,7 @@
 
             &.autosave {
               display: block;
+
               small {
                 display: block;
 
@@ -176,7 +182,20 @@
           height: 100px;
           overflow: hidden;
 
-          &:first-of-type {background-color: white;
+          &.valid {
+            .header {
+              background-color: #b9c9b3;
+            }
+          }
+
+          &.touched {
+            .header {
+              background-color: #dedeb3;
+            }
+          }
+
+          &:first-of-type {
+            background-color: white;
             border-right-width: 1px;
             border-left: none;
 
@@ -192,10 +211,29 @@
           }
 
           .header {
+            display: flex;
             font-size: 13px;
             font-weight: 700;
             padding: 5px;
             background-color: rgb(220, 220, 220);
+
+            .info {
+              flex: 1;
+            }
+
+            .live-feed {
+              display: flex;
+
+              .user-img {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 20px;
+                width: 20px;
+                border-radius: 20px;
+                background-color: white;
+              }
+            }
           }
 
           .data {
@@ -250,7 +288,6 @@
       width: 100%;
       overflow: hidden;
       position: sticky;
-      position: -webkit-sticky;
       background-color: rgb(245, 245, 245);
       top: 0;
 

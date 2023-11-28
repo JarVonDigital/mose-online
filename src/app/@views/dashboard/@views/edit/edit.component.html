@@ -1,0 +1,142 @@
+<div class="editor">
+
+  <div class="top-section" *ngIf="workingFile && users">
+    <div class="info">
+
+      <h2>
+        {{this.workingFile.title}}
+        <small *ngIf="totalTranslatePercentage > 0">| {{totalTranslatePercentage}} / {{workingFile.subtitles.length - 1}}</small>
+      </h2>
+
+      <div class="actions">
+        <div class="action" *ngIf="user?.roles?.isDev || user?.roles?.isLead">
+          <label>Assigned</label>
+          <select [(ngModel)]="workingFile.assignedTo" (change)="onAssignedSelectChange()">
+            <option value="">Unassigned</option>
+            <option *ngFor="let userData of users" [value]="userData.email">{{userData.firstName}} {{userData.lastName}}</option>
+          </select>
+        </div>
+        <div class="action">
+          <label>Status</label>
+          <select [(ngModel)]="workingFile.taskStatus" (change)="onSaveFile()">
+            <option>Select Status</option>
+            <option value="0">Not Started</option>
+            <option value="1">English Translation Pending</option>
+            <option value="2">English Translation Complete</option>
+            <option value="3">Spanish Translation Pending</option>
+            <option value="4">Spanish Translation Complete</option>
+            <option *ngIf="user?.roles?.isLead" value="5">Task Complete</option>
+          </select>
+        </div>
+      </div>
+      <div class="buttons">
+<!--        <button *ngIf="user?.roles?.isDev" (click)="onSetTrainingData()"><img src="https://img.icons8.com/material/96/artificial-intelligence.png" alt="artificial-intelligence"/></button>-->
+<!--        <button (click)="onUnlockFile()" *ngIf="(user?.roles?.isDev || user?.roles?.isLead) && workingFile.isLocked"><img src="https://img.icons8.com/material/96/null/unlock-2.png"/></button>-->
+<!--        <button (click)="onLockFile()" *ngIf="!workingFile.isLocked"><img src="https://img.icons8.com/material/96/null/lock-2&#45;&#45;v1.png"/></button>-->
+<!--        <button (click)="translateAllText()" *ngIf="!workingFile.isLocked"><img src="https://img.icons8.com/material/96/null/google-translate.png"/></button>-->
+<!--        <button (click)="saveFile()"><img src="https://img.icons8.com/material/96/null/save-all&#45;&#45;v2.png"/></button>-->
+<!--        <button class="autosave" (click)="toggleAutoSave()" *ngIf="!workingFile.isLocked">AutoSave<small [ngClass]="{'active': isAutoSaving, 'inactive': !isAutoSaving}">{{isAutoSaving ? 'Active' : 'Inactive'}}</small></button>-->
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button>English <small *ngIf="user?.workingLanguage === 'es'">(READ ONLY)</small></button>
+      <button>Spanish <small *ngIf="user?.workingLanguage === 'en'">(READ ONLY)</small></button>
+    </div>
+
+  </div>
+
+  <div class="internal-editor" id="editor" [formGroup]="workingFileForm" *ngIf="workingFile && workingFile.subtitles.length > 0">
+    <div class="subtitle-section" *ngFor="let subtitle of originalFile.subtitles">
+      <div class="subtitle" [ngClass]="{
+        valid: workingFileForm.get('WFF-' + subtitle.id)?.valid && (workingFileForm.get('WFF-' + subtitle.id)?.value === subtitle.utterance),
+        touched: workingFileForm.get('WFF-' + subtitle.id)?.dirty && (workingFileForm.get('WFF-' + subtitle.id)?.value !== subtitle.utterance)
+      }">
+        <div class="header">
+          <div class="info">
+            {{subtitle.sTimeFormatted}}
+            <small *ngIf="user?.workingLanguage === 'es'">(READ ONLY)</small>
+          </div>
+          <div class="live-feed">
+            <ng-container *ngFor="let user of liveFeedUsers">
+              <div class="user-img" *ngIf="user.isActive && user.elementID === 'WFF-' + subtitle.id">
+                {{user.user.firstName[0] + user.user.lastName[0] | uppercase}}
+              </div>
+            </ng-container>
+          </div>
+        </div>
+        <div class="data" *ngIf="(user?.workingLanguage === 'en' && !workingFile.isLocked) || user.roles.isDev">
+          <textarea
+            [id]="'WFF-' + subtitle.id"
+            [formControlName]="'WFF-' + subtitle.id"
+            spellcheck="false"
+          ></textarea>
+        </div>
+        <div class="data" *ngIf="(user?.workingLanguage !== 'en' || workingFile.isLocked) && !user.roles.isDev">
+          {{subtitle.utterance}}
+        </div>
+      </div>
+      <div class="subtitle" [ngClass]="{
+        valid: workingFileForm.get('WFF-' + subtitle.id + '-es')?.valid && (workingFileForm.get('WFF-' + subtitle.id + '-es')?.value === subtitle.languages['es']),
+        touched: workingFileForm.get('WFF-' + subtitle.id + '-es')?.dirty && (workingFileForm.get('WFF-' + subtitle.id + '-es')?.value !== subtitle.languages['es'])
+      }">
+        <div class="header">{{subtitle.sTimeFormatted}} <small *ngIf="user?.workingLanguage === 'es'">(READ ONLY)</small></div>
+        <div class="data" *ngIf="workingFile.isLocked">
+          {{subtitle.languages['es']}}
+        </div>
+        <div class="data" *ngIf="!workingFile.isLocked && user?.workingLanguage === 'es'">
+          <textarea spellcheck="false" [formControlName]="'WFF-' + subtitle.id + '-es'"></textarea>
+        </div>
+        <div class="data" *ngIf="user?.workingLanguage !== 'es' || workingFile.isLocked">
+          {{subtitle.languages['es']}}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="no-file-selected" *ngIf="!workingFile">
+    <img src="https://img.icons8.com/material/96/null/block-chain.png"/>
+    <h3>Please select a file...</h3>
+  </div>
+</div>
+
+<!--<div class="replacer" *ngIf="workingFile && !workingFile?.isLocked">-->
+
+<!--  <div class="header">-->
+<!--    <button (click)="replaceAllText()">Replace All Text</button>-->
+<!--    <section>-->
+<!--      <li>Original</li>-->
+<!--      <li>></li>-->
+<!--      <li>Replacement</li>-->
+<!--    </section>-->
+<!--  </div>-->
+
+<!--  <div class="replacer-form">-->
+<!--    <div class="fields">-->
+<!--      <div class="left">-->
+<!--        <input type="text" placeholder="search" [(ngModel)]="searchString">-->
+<!--      </div>-->
+<!--      <div class="right">-->
+<!--        <input type="text" placeholder="replace" [(ngModel)]="replacerString">-->
+<!--      </div>-->
+<!--    </div>-->
+<!--    <div class="bottom">-->
+<!--      <button (click)="addReplacement()">Add Replacement</button>-->
+<!--    </div>-->
+<!--  </div>-->
+
+<!--  <div class="replacer-form" *ngFor="let replacer of replacers; let i = index">-->
+<!--    <div class="fields">-->
+<!--      <div class="left">-->
+<!--        <input type="text" placeholder="search" [(ngModel)]="replacer.search[0]">-->
+<!--      </div>-->
+<!--      <div class="right">-->
+<!--        <input type="text" placeholder="replace" [(ngModel)]="replacer.replacers[0]">-->
+<!--      </div>-->
+<!--    </div>-->
+<!--    <div class="bottom">-->
+<!--      <button class="delete" (click)="removeReplacer(i)">Delete</button>-->
+<!--    </div>-->
+<!--  </div>-->
+
+<!--</div>-->

@@ -56,10 +56,7 @@ export class AuthService {
 
   async onSaveUser(user: MoseUser) : Promise<boolean> {
     try {
-      await updateDoc(
-        // @ts-ignore
-        doc(this.firestore, "users", user.email), user
-      )
+      await updateDoc(doc(this.firestore, "users", user.email), (user as any))
       return true;
     } catch (err) {
       return false;

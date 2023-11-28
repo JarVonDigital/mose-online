@@ -6,6 +6,8 @@ import {AuthService} from "../../../../@services/auth/auth.service";
 import {firstValueFrom} from "rxjs";
 import {environment} from "../../../../../environments/environment";
 import {MoseUser} from "../../../../@interfaces/user/mose-user";
+import {ActivatedRoute, Router} from "@angular/router";
+import {Mose} from "../../../../@interfaces/mose-file/mose-file";
 
 interface replacer {
   search: string[],
@@ -18,6 +20,9 @@ interface replacer {
   styleUrls: ['./compare.component.scss']
 })
 export class CompareComponent implements OnInit, OnDestroy {
+
+  private router: Router = inject(Router);
+  private route: ActivatedRoute = inject(ActivatedRoute);
 
   private firestore: Firestore = inject(Firestore);
   private subtitleService: SubtitlesService = inject(SubtitlesService);
@@ -49,7 +54,7 @@ export class CompareComponent implements OnInit, OnDestroy {
     this.replacers = await this.subtitleService.getAllReplacers();
     this.users = await this.authService.getUsers()
 
-    if(this.isAutoSaving) { this.enableAutoSave() }
+    // if(this.isAutoSaving) { this.enableAutoSave() }
 
   }
 
@@ -57,13 +62,17 @@ export class CompareComponent implements OnInit, OnDestroy {
     this.disableAutoSave()
   }
 
-  onSelectSubtitleWorkingFile(file: any) {
+  onSelectSubtitleWorkingFile(file: Mose.File) {
     file.isLocked = (file.isLocked === undefined) ? false : file.isLocked;
     this.workingFile = file;
 
     if(this.user?.roles.isDev) {
       this.onSetTrainingData();
     }
+
+    this.router.navigate(['edit', file.title], {
+      relativeTo: this.route
+    })
   }
 
   onSetTrainingData() {

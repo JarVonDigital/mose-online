@@ -5,16 +5,16 @@
   <li [routerLink]="['view','users']" *ngIf="user.roles.isDev || user.roles.isLead">
     <img src="https://img.icons8.com/material/96/ffffff/conference-call--v2.png"/>
   </li>
-  <li [routerLink]="['view','compare']">
+  <li [routerLink]="['manage']">
     <img src="https://img.icons8.com/material/96/ffffff/compare--v1.png"/>
-  </li>
-  <li [routerLink]="['view','files']" *ngIf="user.roles.isDev || user.roles.isLead">
-    <img src="https://img.icons8.com/material/96/ffffff/folder-invoices--v1.png" alt="">
   </li>
 </div>
 
 <div class="menu-items low">
   <li (click)="onLogout()">
-    <img src="https://img.icons8.com/material/48/ffffff/exit.png"/>
+    <img src="https://img.icons8.com/material-outlined/48/ffffff/exit.png"/>
+  </li>
+  <li>
+    <img src="https://img.icons8.com/material-outlined/48/ffffff/settings--v1.png"/>
   </li>
 </div>

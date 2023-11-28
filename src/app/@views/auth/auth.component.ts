@@ -18,19 +18,26 @@ export class AuthComponent implements OnInit {
 
   private auth = inject(Auth)
   private router = inject(Router);
-  private authService = inject(AuthService)
+  private authService = inject(AuthService);
 
-  loginForm!: FormGroup<LoginForm>;
+  loginForm: FormGroup<LoginForm> = new FormGroup<LoginForm>({
+    email: new FormControl('', {nonNullable: true, validators: [Validators.required, Validators.email]}),
+    password: new FormControl('', {nonNullable: true, validators: [Validators.required]})
+  })
+
+  validationStates = {
+    invalid: (formFieldName: string) => this.loginForm.get(formFieldName)?.invalid && this.loginForm.get(formFieldName)?.touched,
+    valid: (formFieldName: string) => this.loginForm.get(formFieldName)?.valid
+  }
 
   ngOnInit(): void {
 
-    window.addEventListener("keyup", (ev) => (ev.key === "Enter" && this.loginForm.valid) ? this.onLogin() : null)
+    // this.validationStates = {
+    //   invalid: (formFieldName: string) => this.loginForm.get(formFieldName)?.invalid && this.loginForm.get(formFieldName)?.touched,
+    //   valid: (formFieldName: string) => this.loginForm.get(formFieldName)?.valid
+    // }
 
-    // Set Login form
-    this.loginForm = new FormGroup<LoginForm>({
-      email: new FormControl('', {nonNullable: true, validators: [Validators.required, Validators.email]}),
-      password: new FormControl('', {nonNullable: true, validators: [Validators.required]})
-    });
+    window.addEventListener("keyup", (ev) => (ev.key === "Enter" && this.loginForm.valid) ? this.onLogin() : null)
 
   }
 
@@ -39,7 +46,7 @@ export class AuthComponent implements OnInit {
     try {
 
       // Login User
-      const creds : UserCredential = await signInWithEmailAndPassword(
+      const creds: UserCredential = await signInWithEmailAndPassword(
         this.auth,
         this.loginForm.getRawValue().email.toLowerCase(),
         this.loginForm.getRawValue().password
@@ -48,7 +55,7 @@ export class AuthComponent implements OnInit {
       await this.authService.getLoginUser(creds);
       await this.router.navigate(['dashboard'])
 
-    } catch(err) {
+    } catch (err) {
       console.log("There was an error while attempting to login");
     }
 

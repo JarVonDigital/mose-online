@@ -1,28 +1,39 @@
+<form class="form" [formGroup]="loginForm">
 
-<div class="form" [formGroup]="loginForm">
-
-  <div class="title">MOSE | <small>SUBTITLES</small></div>
-
-  <div class="form-field">
-    <div class="icon">
-      <img src="https://img.icons8.com/material/48/ffffff/new-post--v1.png"/>
+  <div class="inner-container">
+    <div class="title">
+      MOSE
+      <small>Translation Manager</small>
     </div>
-    <div class="input">
-      <input type="email" placeholder="email@domain.com" formControlName="email">
+
+    <div class="form-field" [ngClass]="{
+    'invalid': validationStates.invalid('email'),
+    'valid': validationStates.valid('email')
+    }">
+      <div class="icon">
+        <img src="https://img.icons8.com/material/48/774d41/new-post--v1.png"/>
+      </div>
+      <div class="input">
+        <input type="email" placeholder="email@domain.com" formControlName="email">
+      </div>
+    </div>
+
+    <div class="form-field" [ngClass]="{
+    'invalid': validationStates.invalid('password'),
+    'valid': validationStates.valid('password')
+    }">
+      <div class="icon">
+        <img src="https://img.icons8.com/material/48/774d41/lock-2--v1.png"/>
+      </div>
+      <div class="input">
+        <input type="password" placeholder="pass****" formControlName="password">
+      </div>
+    </div>
+
+    <div class="buttons">
+      <button [disabled]="loginForm.invalid" (click)="onLogin()">Login</button>
     </div>
   </div>
 
-  <div class="form-field">
-    <div class="icon">
-      <img src="https://img.icons8.com/material/48/ffffff/lock-2--v1.png"/>
-    </div>
-    <div class="input">
-      <input type="password" placeholder="pass****" formControlName="password">
-    </div>
-  </div>
 
-  <div class="buttons">
-    <button [disabled]="loginForm.invalid" (click)="onLogin()">Login</button>
-  </div>
-
-</div>
+</form>

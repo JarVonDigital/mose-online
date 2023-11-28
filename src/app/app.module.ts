@@ -12,9 +12,9 @@ import { provideAuth,getAuth } from '@angular/fire/auth';
 import { provideFirestore,getFirestore } from '@angular/fire/firestore';
 import { DashboardComponent } from './@views/dashboard/dashboard.component';
 import { SidebarComponent } from './@views/dashboard/@elements/sidebar/sidebar.component';
-import { FilesComponent } from './@views/dashboard/@views/files/files.component';
 import {HttpClientModule} from "@angular/common/http";
 import { UsersComponent } from './@views/dashboard/@views/users/users.component';
+import { EditComponent } from './@views/dashboard/@views/edit/edit.component';
 
 @NgModule({
   declarations: [
@@ -23,8 +23,8 @@ import { UsersComponent } from './@views/dashboard/@views/users/users.component'
     CompareComponent,
     DashboardComponent,
     SidebarComponent,
-    FilesComponent,
-    UsersComponent
+    UsersComponent,
+    EditComponent
   ],
   imports: [
     BrowserModule,
