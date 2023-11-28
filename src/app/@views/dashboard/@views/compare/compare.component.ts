@@ -157,7 +157,7 @@ export class CompareComponent implements OnInit, OnDestroy {
 
   async translateAllText() {
     if(!window.confirm("Are you sure you want to translate English to Spanish?")) return;
-    this.updatingNumber = 1;
+    this.updatingNumber = 0;
     for (const subtitle of this.workingFile.subtitles) {
       const translation = await firstValueFrom(
         this.http.post<any>(`https://api.openai.com/v1/completions`,
@@ -181,7 +181,7 @@ export class CompareComponent implements OnInit, OnDestroy {
     }
 
     await this.saveFile();
-    window.alert(`Translation Complete: ${this.updatingNumber}/${this.workingFile.subtitles.length - 1}`);
+    window.alert(`Translation Complete`);
     this.updatingNumber = 0;
   }
 
@@ -268,5 +268,36 @@ export class CompareComponent implements OnInit, OnDestroy {
       editor.scrollTop = (this.workingFile.scrollLock[this.user.email] as number) || 0;
     }
 
+  }
+
+  getPercent(number: number) {
+    return Math.round(number);
+  }
+
+  genSrtFromJSON(json: any, language = 'en') {
+    let string = "";
+
+    if(language === 'en') {
+      json.subtitles.forEach((subtitle: any, index: number) => {
+        string +=`${index + 1}\n${subtitle.sTimeFormatted} --> ${subtitle.eTimeFormatted}\n${subtitle.utterance}\n\n`
+      })
+    } else {
+      json.subtitles.forEach((subtitle: any, index: number) => {
+        string +=`${index + 1}\n${subtitle.sTimeFormatted} --> ${subtitle.eTimeFormatted}\n${subtitle.languages[language]}\n\n`
+      })
+    }
+
+    const link = document.createElement("a");
+    const file = new Blob([string], {type: 'text/plain'});
+    link.href = URL.createObjectURL(file);
+    link.download = `${json.title}-${language}.srt`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+
+    return string;
+  }
+
+  onGenerateSRT(language: 'en' | 'es') {
+    this.genSrtFromJSON(this.workingFile, language);
   }
 }

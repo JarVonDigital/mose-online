@@ -23,7 +23,7 @@
 
   <div class="top-section" *ngIf="workingFile">
     <div class="info">
-      <h2>{{this.workingFile.title}} <small *ngIf="this.updatingNumber > 0">| {{this.updatingNumber}} / {{this.workingFile.subtitles.length - 1}}</small></h2>
+      <h2>{{this.workingFile.title}} <small class="translating-progress" *ngIf="this.updatingNumber > 0">{{getPercent((100 * (this.updatingNumber / this.workingFile.subtitles.length)))}}% Translated</small></h2>
       <div class="actions">
         <div class="action" *ngIf="user?.roles?.isDev || user?.roles?.isLead">
           <label>Assigned</label>
@@ -49,15 +49,21 @@
         <button *ngIf="user?.roles?.isDev" (click)="onSetTrainingData()"><img src="https://img.icons8.com/material/96/artificial-intelligence.png" alt="artificial-intelligence"/></button>
         <button (click)="onUnlockFile()" *ngIf="(user?.roles?.isDev || user?.roles?.isLead) && workingFile.isLocked"><img src="https://img.icons8.com/material/96/null/unlock-2.png"/></button>
         <button (click)="onLockFile()" *ngIf="!workingFile.isLocked"><img src="https://img.icons8.com/material/96/null/lock-2--v1.png"/></button>
-        <button (click)="translateAllText()" *ngIf="!workingFile.isLocked"><img src="https://img.icons8.com/material/96/null/google-translate.png"/></button>
+        <button (click)="translateAllText()" *ngIf="!workingFile.isLocked || user?.roles?.isDev"><img src="https://img.icons8.com/material/96/null/google-translate.png"/></button>
         <button (click)="saveFile()"><img src="https://img.icons8.com/material/96/null/save-all--v2.png"/></button>
         <button class="autosave" (click)="toggleAutoSave()" *ngIf="!workingFile.isLocked">AutoSave<small [ngClass]="{'active': isAutoSaving, 'inactive': !isAutoSaving}">{{isAutoSaving ? 'Active' : 'Inactive'}}</small></button>
       </div>
     </div>
 
     <div class="tabs">
-      <button>English <small *ngIf="user?.workingLanguage === 'es'">(READ ONLY)</small></button>
-      <button>Spanish <small *ngIf="user?.workingLanguage === 'en'">(READ ONLY)</small></button>
+      <button>
+        English <small *ngIf="user?.workingLanguage === 'es'">(READ ONLY)</small>
+        <button (click)="onGenerateSRT('en')"><img src="https://img.icons8.com/material/96/download--v1.png" alt="download--v1"/></button>
+      </button>
+      <button>
+        Spanish <small *ngIf="user?.workingLanguage === 'en'">(READ ONLY)</small>
+        <button (click)="onGenerateSRT('es')"><img src="https://img.icons8.com/material/96/download--v1.png" alt="download--v1"/></button>
+      </button>
     </div>
 
   </div>
@@ -75,14 +81,11 @@
        </div>
        <div class="subtitle">
          <div class="header">{{subtitle.sTimeFormatted}} <small *ngIf="user?.workingLanguage === 'es'">(READ ONLY)</small></div>
-         <div class="data" *ngIf="workingFile.isLocked">
-           {{subtitle.languages.es}}
-         </div>
          <div class="data" *ngIf="!workingFile.isLocked && user?.workingLanguage === 'es'">
            <textarea spellcheck="false" [(ngModel)]="subtitle.languages.es"></textarea>
          </div>
          <div class="data" *ngIf="user?.workingLanguage !== 'es' || workingFile.isLocked">
-           {{subtitle.utterance}}
+           {{subtitle.languages.es}}
          </div>
        </div>
      </div>

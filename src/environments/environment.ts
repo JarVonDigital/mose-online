@@ -13,7 +13,7 @@ export const environment = {
     measurementId: 'G-6GPRTX142H',
   },
   production: false,
-  OPENAI_API_KEY: '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'
+  OPENAI_API_KEY: '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'
 };
 
 /*
