@@ -8,6 +8,6 @@ export const environment = {
     messagingSenderId: '624483313128',
     measurementId: 'G-6GPRTX142H',
   },
-  OPENAI_API_KEY: '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',
+  OPENAI_API_KEY: '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',
   production: true
 };
