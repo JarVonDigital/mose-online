@@ -160,13 +160,15 @@ export class CompareComponent implements OnInit, OnDestroy {
     this.updatingNumber = 0;
     for (const subtitle of this.workingFile.subtitles) {
       const translation = await firstValueFrom(
-        this.http.post<any>(`https://api.openai.com/v1/completions`,
+        this.http.post<any>(`https://api.openai.com/v1/chat/completions`,
         {
-          model: 'curie:ft-jarvondigital:mose-translate-2023-08-14-00-31-43',
-          prompt: `${subtitle.utterance};;`,
+          model: 'ft:gpt-3.5-turbo-1106:jarvondigital::8YmF9ySX',
+          messages: [
+            {role: "system", content: "translate from english to spanish"},
+            {role: "user", content: subtitle.utterance}
+          ],
           temperature: 0,
-          max_tokens: 256,
-          stop: ';;'
+          max_tokens: 256
         },
         {
           headers: {
@@ -176,7 +178,7 @@ export class CompareComponent implements OnInit, OnDestroy {
         })
       );
 
-      subtitle.languages.es = translation.choices[0].text.trim();
+      subtitle.languages.es = translation.choices[0].message.content.trim();
       this.updatingNumber++;
     }
 
