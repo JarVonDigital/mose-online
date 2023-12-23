@@ -3,40 +3,71 @@
   <div class="top-section" *ngIf="workingFile && users">
     <div class="info">
 
-      <h2>
-        {{this.workingFile.title}}
-        <small *ngIf="totalTranslatePercentage > 0">| {{totalTranslatePercentage}} / {{workingFile.subtitles.length - 1}}</small>
-      </h2>
+      <div class="upper-info">
+        <div class="title">
+          {{ this.workingFile.title }}
+          <small *ngIf="totalTranslatePercentage > 0">| {{ totalTranslatePercentage }}
+            / {{ workingFile.subtitles.length - 1 }}</small>
+        </div>
+        <div class="status-tracker">
+          <div
+            *ngFor="let status of statusOptions; index as i" class="status-label"
+            [ngClass]="{
+              'prev-status': i < workingFile.taskStatus,
+              'next-status': i > workingFile.taskStatus
+            }"
+          >
+            <div class="short"
+                 *ngIf="workingFile.taskStatus != i">{{ i === 0 ? i : (((i + 1) / statusOptions.length) * 100) }}%
+            </div>
+            <div class="long" *ngIf="workingFile.taskStatus == i">
+              <div class="position">{{ i === 0 ? i : (((i + 1) / statusOptions.length) * 100) }}%</div>
+              <div class="details">
+                {{ status }}
+                <small>Assigned: {{ workingFile.assignedTo }}</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <div class="actions">
-        <div class="action" *ngIf="user?.roles?.isDev || user?.roles?.isLead">
-          <label>Assigned</label>
-          <select [(ngModel)]="workingFile.assignedTo" (change)="onAssignedSelectChange()">
-            <option value="">Unassigned</option>
-            <option *ngFor="let userData of users" [value]="userData.email">{{userData.firstName}} {{userData.lastName}}</option>
-          </select>
+      <div class="lower-info" *ngIf="user.roles.isDev || user.roles.isLead">
+        <div class="actions">
+          <div class="action" *ngIf="user?.roles?.isDev || user?.roles?.isLead">
+            <label>Assigned</label>
+            <select [(ngModel)]="workingFile.assignedTo" (change)="onAssignedSelectChange()">
+              <option value="">Unassigned</option>
+              <option *ngFor="let userData of users"
+                      [value]="userData.email">{{ userData.firstName }} {{ userData.lastName }}
+              </option>
+            </select>
+          </div>
+          <div class="action">
+            <label>Status</label>
+            <select [(ngModel)]="workingFile.taskStatus" (change)="onSaveFile()">
+              <option *ngFor="let status of statusOptions; index as i" [value]="i">{{ status }}</option>
+            </select>
+          </div>
+          <div class="action">
+            <label>Video File Options</label>
+            <input
+              type="file"
+              id="workingFileVideoFilePicker"
+              accept="application/mp4"
+              (change)="setVideoFromPicker($event)">
+          </div>
         </div>
-        <div class="action">
-          <label>Status</label>
-          <select [(ngModel)]="workingFile.taskStatus" (change)="onSaveFile()">
-            <option>Select Status</option>
-            <option value="0">Not Started</option>
-            <option value="1">English Translation Pending</option>
-            <option value="2">English Translation Complete</option>
-            <option value="3">Spanish Translation Pending</option>
-            <option value="4">Spanish Translation Complete</option>
-            <option *ngIf="user?.roles?.isLead" value="5">Task Complete</option>
-          </select>
+        <div class="buttons">
+          <button *ngIf="user?.roles?.isDev" (click)="onSetTrainingData()"><img
+            src="https://img.icons8.com/material/96/artificial-intelligence.png" alt="artificial-intelligence"/>
+          </button>
+          <!--        <button (click)="onUnlockFile()" *ngIf="(user?.roles?.isDev || user?.roles?.isLead) && workingFile.isLocked"><img src="https://img.icons8.com/material/96/null/unlock-2.png"/></button>-->
+          <!--        <button (click)="onLockFile()" *ngIf="!workingFile.isLocked"><img src="https://img.icons8.com/material/96/null/lock-2&#45;&#45;v1.png"/></button>-->
+          <button (click)="translateAllText()" *ngIf="!workingFile.isLocked"><img
+            src="https://img.icons8.com/material/96/null/google-translate.png"/></button>
         </div>
       </div>
-      <div class="buttons">
-<!--        <button *ngIf="user?.roles?.isDev" (click)="onSetTrainingData()"><img src="https://img.icons8.com/material/96/artificial-intelligence.png" alt="artificial-intelligence"/></button>-->
-<!--        <button (click)="onUnlockFile()" *ngIf="(user?.roles?.isDev || user?.roles?.isLead) && workingFile.isLocked"><img src="https://img.icons8.com/material/96/null/unlock-2.png"/></button>-->
-<!--        <button (click)="onLockFile()" *ngIf="!workingFile.isLocked"><img src="https://img.icons8.com/material/96/null/lock-2&#45;&#45;v1.png"/></button>-->
-<!--        <button (click)="translateAllText()" *ngIf="!workingFile.isLocked"><img src="https://img.icons8.com/material/96/null/google-translate.png"/></button>-->
-<!--        <button (click)="saveFile()"><img src="https://img.icons8.com/material/96/null/save-all&#45;&#45;v2.png"/></button>-->
-<!--        <button class="autosave" (click)="toggleAutoSave()" *ngIf="!workingFile.isLocked">AutoSave<small [ngClass]="{'active': isAutoSaving, 'inactive': !isAutoSaving}">{{isAutoSaving ? 'Active' : 'Inactive'}}</small></button>-->
-      </div>
+
     </div>
 
     <div class="tabs">
@@ -46,52 +77,76 @@
 
   </div>
 
-  <div class="internal-editor" id="editor" [formGroup]="workingFileForm" *ngIf="workingFile && workingFile.subtitles.length > 0">
-    <div class="subtitle-section" *ngFor="let subtitle of originalFile.subtitles">
-      <div class="subtitle" [ngClass]="{
+  <div
+    id="editor"
+    class="internal-editor"
+    [formGroup]="workingFileForm"
+    *ngIf="workingFile && workingFile.subtitles.length > 0">
+
+    <!-- Video Player -->
+    <div *ngIf="hasVideoFile" class="video-player">
+      <video [src]="videoDataSource" #videoSource (canplay)="setLocalVideoElement(videoSource)"></video>
+      <button (click)="onPlayVideo(videoSource)">Play</button>
+      <button (click)="onPauseVideo(videoSource)">Pause</button>
+    </div>
+
+    <div class="subtitle-section-container">
+
+      <div class="subtitle-section" *ngFor="let subtitle of originalFile.subtitles; index as i">
+
+        <!-- English -->
+        <div *ngIf="!hasVideoFile" class="subtitle" [ngClass]="{
         valid: workingFileForm.get('WFF-' + subtitle.id)?.valid && (workingFileForm.get('WFF-' + subtitle.id)?.value === subtitle.utterance),
         touched: workingFileForm.get('WFF-' + subtitle.id)?.dirty && (workingFileForm.get('WFF-' + subtitle.id)?.value !== subtitle.utterance)
       }">
-        <div class="header">
-          <div class="info">
-            {{subtitle.sTimeFormatted}}
-            <small *ngIf="user?.workingLanguage === 'es'">(READ ONLY)</small>
+          <div class="header">
+            <div class="info">
+              {{ subtitle.sTimeFormatted }}
+              <small *ngIf="user?.workingLanguage === 'es'">(READ ONLY)</small>
+            </div>
+            <div class="live-feed"> <!-- TODO: User In Live Feed will Show Here --> </div>
           </div>
-          <div class="live-feed">
-            <ng-container *ngFor="let user of liveFeedUsers">
-              <div class="user-img" *ngIf="user.isActive && user.elementID === 'WFF-' + subtitle.id">
-                {{user.user.firstName[0] + user.user.lastName[0] | uppercase}}
-              </div>
-            </ng-container>
-          </div>
-        </div>
-        <div class="data" *ngIf="(user?.workingLanguage === 'en' && !workingFile.isLocked) || user.roles.isDev">
+          <div class="data" *ngIf="(user?.workingLanguage === 'en' && !workingFile.isLocked) || user.roles.isDev">
           <textarea
             [id]="'WFF-' + subtitle.id"
             [formControlName]="'WFF-' + subtitle.id"
             spellcheck="false"
           ></textarea>
+          </div>
+          <div class="data" *ngIf="(user?.workingLanguage !== 'en' || workingFile.isLocked) && !user.roles.isDev">
+            {{ subtitle.utterance }}
+          </div>
         </div>
-        <div class="data" *ngIf="(user?.workingLanguage !== 'en' || workingFile.isLocked) && !user.roles.isDev">
-          {{subtitle.utterance}}
-        </div>
-      </div>
-      <div class="subtitle" [ngClass]="{
+
+        <!-- Spanish -->
+        <div id="sub-{{i}}" class="subtitle" [ngClass]="{
+        active: subtitle.isActive,
         valid: workingFileForm.get('WFF-' + subtitle.id + '-es')?.valid && (workingFileForm.get('WFF-' + subtitle.id + '-es')?.value === subtitle.languages['es']),
         touched: workingFileForm.get('WFF-' + subtitle.id + '-es')?.dirty && (workingFileForm.get('WFF-' + subtitle.id + '-es')?.value !== subtitle.languages['es'])
       }">
-        <div class="header">{{subtitle.sTimeFormatted}} <small *ngIf="user?.workingLanguage === 'es'">(READ ONLY)</small></div>
-        <div class="data" *ngIf="workingFile.isLocked">
-          {{subtitle.languages['es']}}
+          <div class="header">
+            {{ subtitle.sTimeFormatted }}
+            <small *ngIf="user?.workingLanguage === 'es'">(READ ONLY)</small>
+            <button
+              (click)="onStartPlayAtTime(subtitle.sTime)"
+              *ngIf="hasVideoFile"
+            >Play Subtitle</button>
+          </div>
+          <div class="data" *ngIf="workingFile.isLocked">
+            {{ subtitle.languages['es'] }}
+          </div>
+          <div class="data" *ngIf="!workingFile.isLocked && user?.workingLanguage === 'es'">
+            <textarea spellcheck="false" [formControlName]="'WFF-' + subtitle.id + '-es'"></textarea>
+          </div>
+          <div class="data" *ngIf="user?.workingLanguage !== 'es' || workingFile.isLocked">
+            {{ subtitle.languages['es'] }}
+          </div>
         </div>
-        <div class="data" *ngIf="!workingFile.isLocked && user?.workingLanguage === 'es'">
-          <textarea spellcheck="false" [formControlName]="'WFF-' + subtitle.id + '-es'"></textarea>
-        </div>
-        <div class="data" *ngIf="user?.workingLanguage !== 'es' || workingFile.isLocked">
-          {{subtitle.languages['es']}}
-        </div>
+
       </div>
     </div>
+
+
   </div>
 
   <div class="no-file-selected" *ngIf="!workingFile">

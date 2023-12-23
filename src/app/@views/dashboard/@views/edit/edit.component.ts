@@ -1,13 +1,14 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, inject, OnInit, Sanitizer} from '@angular/core';
 import {Mose} from "../../../../@interfaces/mose-file/mose-file";
 import {MoseManager} from "../../../../core/structure/classes/mose-manager";
 import {AuthService} from "../../../../@services/auth/auth.service";
 import {MoseUserManager} from "../../../../core/structure/classes/mose-user-manager";
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, Data} from "@angular/router";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {SubtitlesService} from "../../../../@services/subtitles/subtitles.service";
-import {doc, Firestore, onSnapshot} from "@angular/fire/firestore";
-import {environment} from "../../../../../environments/environment";
+import {Firestore} from "@angular/fire/firestore";
+import File = Mose.File;
+import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 
 interface LiveFeed {
   elementID: string,
@@ -29,6 +30,7 @@ export class EditComponent implements OnInit {
   private route: ActivatedRoute = inject(ActivatedRoute);
   private firestore: Firestore = inject(Firestore);
   private subtitleService: SubtitlesService = inject(SubtitlesService);
+  private sanitize: DomSanitizer = inject(DomSanitizer);
 
   private _workingFileForm: FormGroup<any> = new FormGroup<any>({});
 
@@ -38,7 +40,20 @@ export class EditComponent implements OnInit {
   private _users: Mose.User[] = [];
   private _totalTranslatePercentage: number = 0;
 
-  liveFeedUsers: LiveFeed[] = [];
+  private _statusOptions = [
+    "Awaiting Assignment",
+    "English Translation Started",
+    "English Translation Verified",
+    "English Translation Complete",
+    "Spanish Translation Started",
+    "Spanish Translation Verified",
+    "Spanish Translation Complete",
+    "Task Complete"
+  ];
+
+  hasVideoFile = false;
+  videoDataSource: SafeUrl = '';
+  private videoElement: HTMLVideoElement | undefined;
 
   async ngOnInit() {
 
@@ -47,24 +62,8 @@ export class EditComponent implements OnInit {
     this.user = this.authService.loginCreds;
 
     // Listen For Route Data
-    // TODO: Cleanup Subscription
     this.route.data
-      .subscribe((data) => {
-
-        // Listen for changes to data
-        let updates = 0;
-
-        const file: Mose.File = data['workingFile'] as Mose.File;
-        this.liveFeedUsers = Object.values(file.liveFeed as any) as unknown as LiveFeed[];
-        this.onInitWorkingFile(file, updates > 0);
-
-        onSnapshot(doc(this.firestore, `subtitles${environment.production ? '' : '-staging'}`, this.route.snapshot.params['uuid']), (doc) => {
-          if (updates > 0) {
-            this.updateForm(doc.data() as Mose.File)
-          }
-          updates++;
-        });
-      });
+      .subscribe((data: Data) => this.onInitWorkingFile(data['workingFile'] as Mose.File, false));
 
   }
 
@@ -82,13 +81,8 @@ export class EditComponent implements OnInit {
         // Create Master Control else {
         this.workingFileForm.addControl(`WFF-${item.id}`, new FormControl(item.utterance, {validators: Validators.required}));
         this._workingFileForm.get(`WFF-${item.id}`)?.valueChanges.subscribe((val: string) => {
-
-          // if(item.utterance)
-
           item.utterance = val;
-
-
-          // this.onCheckCursorLocation(`WFF-${item.id}`)
+          this.onSaveFile()
         });
 
 
@@ -98,7 +92,7 @@ export class EditComponent implements OnInit {
           this.workingFileForm.addControl(`WFF-${item.id}-${lang}`, new FormControl(item.languages[lang], {validators: Validators.required}));
           this._workingFileForm.get(`WFF-${item.id}-${lang}`)?.valueChanges.subscribe((val: string) => {
             item.languages[lang] = val;
-            this.onCheckCursorLocation(`WFF-${item.id}-${lang}`);
+            this.onSaveFile()
           });
 
         }
@@ -184,56 +178,80 @@ export class EditComponent implements OnInit {
     this._originalFile = value;
   }
 
-  onCheckCursorLocation(id: string) {
-    const cursorPosition = (document.getElementById(id) as any).selectionStart;
-    this.updateLiveFeed({
-      elementID: id,
-      cursorPosition,
-      user: this.user,
-      isActive: true,
-      inDocument: true
-    })
+  get statusOptions(): string[] {
+    return this._statusOptions;
   }
 
-  // TODO CHANGE TO AN INTERFACE
-  private updateLiveFeed(param: {
-    elementID: string,
-    cursorPosition: number,
-    user: Mose.User,
-    isActive: boolean,
-    inDocument: boolean
-  }) {
-
-    // Verify Property Exist
-    if (!this.workingFile.liveFeed) {
-      this.workingFile['liveFeed'] = {};
-    }
-
-    // Set Working File
-    // TODO: Dont change original
-    Object.assign(this.workingFile, param)
-    this.workingFile.liveFeed[param.user.email] = param;
-    console.log(this.workingFile.liveFeed[param.user.email])
-
-    // Save File
-    this.onSaveFile();
+  translateAllText() {
 
   }
 
-  private updateForm(data1: Mose.File) {
-    for (let item of data1.subtitles) {
+  onSetTrainingData() {
 
-      if(this.workingFileForm.get(`WFF-${item.id}`)?.getRawValue() != item.utterance) {
-        this.workingFileForm.get(`WFF-${item.id}`)?.patchValue(item.utterance);
-      }
+  }
 
-      // Create control for subsequent languages
-      for (let lang of Object.keys(item.languages)) {
-        if(this.workingFileForm.get(`WFF-${item.id}-${lang}`)?.getRawValue() != item.languages[lang]) {
-          this.workingFileForm.get(`WFF-${item.id}-${lang}`)?.patchValue(item.languages[lang]);
-        }
-      }
+  setVideoFromPicker($event: Event) {
 
+    const picker = $event.target as unknown as HTMLInputElement;
+    const file = (picker.files as unknown as FileList[])[0]
+
+    // Handle if file comes with video
+
+    let newUrl = URL.createObjectURL(file as any);
+    this.videoDataSource = this.sanitize.bypassSecurityTrustUrl(newUrl);
+    this.hasVideoFile = true;
+
+  }
+
+  onPlayVideo(videoSource: HTMLVideoElement) {
+    videoSource.play();
+  }
+
+  onPauseVideo(videoSource: HTMLVideoElement) {
+    videoSource.pause()
+  }
+
+  onStartPlayAtTime(sTime: number) {
+    if(this.videoElement) {
+      this.videoElement.currentTime = sTime;
+      this.videoElement.play();
     }
+  }
+
+  setLocalVideoElement(videoSource: HTMLVideoElement) {
+    this.videoElement = videoSource;
+    let currentSelected = 0;
+
+    this.videoElement.onplay = () => {
+      setInterval(() => {
+        this.workingFile.subtitles.forEach((subtitle, index) => {
+          if (this.thisSubtitleActive(subtitle)) {
+            if (currentSelected !== index) {
+              currentSelected = index;
+              subtitle.isActive = true;
+
+              // Scroll to index
+              const currentElement = document.querySelector(`#sub-${index}`) as HTMLElement;
+              currentElement.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+              });
+
+            }
+          } else {
+            subtitle.isActive = false;
+          }
+        });
+      }, 0);
+    }
+
+
+  }
+
+  thisSubtitleActive(subtitle: Mose.Subtitle) {
+    let currentSoundTime = this.videoElement?.currentTime ?? 0;
+    const overTime = (currentSoundTime > subtitle.sTime);
+    const underTime = (currentSoundTime < subtitle.eTime);
+    return (overTime && underTime);
   }
 }
