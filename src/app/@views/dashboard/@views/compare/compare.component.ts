@@ -166,31 +166,34 @@ export class CompareComponent implements OnInit, OnDestroy {
 
   async translateAllText() {
     if(!window.confirm("Are you sure you want to translate English to Spanish?")) return;
-    this.updatingNumber = 1;
+    const appKeys = await this.authService.getAppKeys();
+    this.updatingNumber = 0;
     for (const subtitle of this.workingFile.subtitles) {
       const translation = await firstValueFrom(
-        this.http.post<any>(`https://api.openai.com/v1/completions`,
+        this.http.post<any>(`https://api.openai.com/v1/chat/completions`,
         {
-          model: 'curie:ft-jarvondigital:mose-translate-2023-08-14-00-31-43',
-          prompt: `${subtitle.utterance};;`,
+          model: 'ft:gpt-3.5-turbo-1106:jarvondigital::8YmF9ySX',
+          messages: [
+            {role: "system", content: "translate from english to spanish"},
+            {role: "user", content: subtitle.utterance}
+          ],
           temperature: 0,
-          max_tokens: 256,
-          stop: ';;'
+          max_tokens: 256
         },
         {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${environment.OPENAI_API_KEY}`
+            'Authorization': `Bearer ${appKeys.OPEN_AI}`
           }
         })
       );
 
-      subtitle.languages.es = translation.choices[0].text.trim();
+      subtitle.languages.es = translation.choices[0].message.content.trim();
       this.updatingNumber++;
     }
 
     await this.saveFile();
-    window.alert(`Translation Complete: ${this.updatingNumber}/${this.workingFile.subtitles.length - 1}`);
+    window.alert(`Translation Complete`);
     this.updatingNumber = 0;
   }
 
@@ -277,5 +280,36 @@ export class CompareComponent implements OnInit, OnDestroy {
       editor.scrollTop = (this.workingFile.scrollLock[this.user.email] as number) || 0;
     }
 
+  }
+
+  getPercent(number: number) {
+    return Math.round(number);
+  }
+
+  genSrtFromJSON(json: any, language = 'en') {
+    let string = "";
+
+    if(language === 'en') {
+      json.subtitles.forEach((subtitle: any, index: number) => {
+        string +=`${index + 1}\n${subtitle.sTimeFormatted} --> ${subtitle.eTimeFormatted}\n${subtitle.utterance}\n\n`
+      })
+    } else {
+      json.subtitles.forEach((subtitle: any, index: number) => {
+        string +=`${index + 1}\n${subtitle.sTimeFormatted} --> ${subtitle.eTimeFormatted}\n${subtitle.languages[language]}\n\n`
+      })
+    }
+
+    const link = document.createElement("a");
+    const file = new Blob([string], {type: 'text/plain'});
+    link.href = URL.createObjectURL(file);
+    link.download = `${json.title}-${language}.srt`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+
+    return string;
+  }
+
+  onGenerateSRT(language: 'en' | 'es') {
+    this.genSrtFromJSON(this.workingFile, language);
   }
 }

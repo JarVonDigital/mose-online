@@ -54,6 +54,17 @@ export class AuthService {
     return query.docs.map(doc => doc.data()) as MoseUser[];
   }
 
+  async getAppKeys() {
+
+    interface ApiKeys {
+      OPEN_AI: string
+    }
+
+    let query = await getDocs(collection(this.firestore, "settings/keys"))
+    return query.docs.find(doc => doc.id === 'keys') as unknown as ApiKeys;
+
+  }
+
   async onSaveUser(user: MoseUser) : Promise<boolean> {
     try {
       await updateDoc(doc(this.firestore, "users", user.email), (user as any))
