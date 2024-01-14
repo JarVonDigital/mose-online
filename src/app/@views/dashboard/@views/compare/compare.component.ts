@@ -157,6 +157,7 @@ export class CompareComponent implements OnInit, OnDestroy {
 
   async translateAllText() {
     if(!window.confirm("Are you sure you want to translate English to Spanish?")) return;
+    const appKeys = await this.authService.getAppKeys();
     this.updatingNumber = 0;
     for (const subtitle of this.workingFile.subtitles) {
       const translation = await firstValueFrom(
@@ -173,7 +174,7 @@ export class CompareComponent implements OnInit, OnDestroy {
         {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${environment.OPENAI_API_KEY}`
+            'Authorization': `Bearer ${appKeys.OPEN_AI}`
           }
         })
       );
