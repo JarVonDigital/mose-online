@@ -1,17 +1,14 @@
 <form class="form" [formGroup]="loginForm">
 
   <div class="inner-container">
-    <div class="title">
-      MOSE
-      <small>Translation Manager</small>
-    </div>
+    <div class="title">M</div>
 
     <div class="form-field" [ngClass]="{
     'invalid': validationStates.invalid('email'),
     'valid': validationStates.valid('email')
     }">
       <div class="icon">
-        <img src="https://img.icons8.com/material/48/774d41/new-post--v1.png"/>
+        <img src="https://img.icons8.com/material/48/ffffff/new-post--v1.png"/>
       </div>
       <div class="input">
         <input type="email" placeholder="email@domain.com" formControlName="email">
@@ -23,7 +20,7 @@
     'valid': validationStates.valid('password')
     }">
       <div class="icon">
-        <img src="https://img.icons8.com/material/48/774d41/lock-2--v1.png"/>
+        <img src="https://img.icons8.com/material/48/ffffff/lock-2--v1.png"/>
       </div>
       <div class="input">
         <input type="password" placeholder="pass****" formControlName="password">

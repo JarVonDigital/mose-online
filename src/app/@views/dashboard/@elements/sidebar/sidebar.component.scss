@@ -1,9 +1,11 @@
 :host {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  align-items: center;
+  height: calc(100vh - 10px);
   width: 65px;
-  background-color: #a8a8a8;
+  background-color: rgb(45, 45, 45);
+  padding: 5px 0;
 
   .header {
     display: flex;
@@ -12,9 +14,12 @@
     font-family: 'Nanum Myeongjo', serif;
     font-weight: 600;
     font-size: 30px;
-    height: 65px;
-    width: 65px;
+    height: 50px;
+    width: 50px;
+    background-color: rgb(30, 30, 30);
     color: white;
+    border-radius: 5px;
+    margin-top: 5px;
 
     small {
       font-family: 'Varela Round', sans-serif;
@@ -31,6 +36,11 @@
 
     &.low {
       justify-content: flex-end;
+
+      li {
+        margin-top: 0;
+        margin-bottom: 5px;
+      }
     }
 
     li {
@@ -39,13 +49,15 @@
       justify-content: center;
       list-style: none;
       cursor: pointer;
-      height: 45px;
-      width: 45px;
-      border-top: 2px solid white;
+      height: 50px;
+      width: 50px;
+      background-color: rgb(30, 30, 30);
+      border-radius: 5px;
+      margin-top: 5px;
 
       img {
         display: block;
-        height: 25px;
+        height: 20px;
       }
 
       &:hover {

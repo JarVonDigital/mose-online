@@ -11,15 +11,6 @@
     {{subtitle.title}}
     <small *ngIf="subtitle.assignedTo">{{subtitle.assignedTo}}</small>
     <small *ngIf="!subtitle.assignedTo">Unassigned</small>
-    <select [disabled]="(!user.roles.isDev || !user.roles.isLead)" [(ngModel)]="subtitle.taskStatus" (change)="saveFile()">
-      <option>Select Status</option>
-      <option value="0">Not Started</option>
-      <option value="1">English Translation Pending</option>
-      <option value="2">English Translation Complete</option>
-      <option value="3">Spanish Translation Pending</option>
-      <option value="4">Spanish Translation Complete</option>
-      <option *ngIf="user.roles.isLead" value="5">Task Complete</option>
-    </select>
   </li>
 
 </div>

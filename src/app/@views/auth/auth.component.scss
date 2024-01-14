@@ -2,33 +2,39 @@
   height: 100vh;
   width: 100vw;
   display: flex;
-  align-items: center;
-  justify-content: center;
 
   form, .form {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     height: 100vh;
     width: 500px;
-    background-color: rgba(140, 140, 140, 0.68);
+    background-color: rgb(45, 45, 45);
     box-shadow: 0px 0px 10px -5px;
 
     .inner-container {
-
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     .title {
       display: flex;
+      width: 100%;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       font-family: 'Nanum Myeongjo', serif;
-      font-size: 50px;
+      background-color: rgb(30 ,30, 30);
+      font-size: 120px;
+      font-weight: 600;
       color: white;
-      border-bottom: 2px solid rgb(90, 90,90);
-      margin: 20px 0;
+      padding: 50px 0;
+      margin-bottom: 50px;
+      cursor: default;
 
       small {
         display: block;
@@ -42,27 +48,42 @@
       display: flex;
       background-color: white;
       color: white;
-      border: 2px solid transparent;
-      border-radius: 15px;
       align-items: center;
       width: 100%;
-      min-width: 300px;
-      max-width: 300px;
-      margin: 15px 0;
+      min-width: 400px;
+      max-width: 400px;
+      margin-bottom: 50px;
       font-family: 'Varela Round', sans-serif;
+      position: relative;
+
+      &:after {
+        position: absolute;
+        content: "";
+        height: 5px;
+        width: calc(100% - 50px);
+        background-color: #427c42;
+        top: 60px;
+        margin-left: 50px;
+        border-radius: 10px;
+      }
 
       &.invalid {
-        border-color: #a62929;
+        &:after {
+          background-color: #a62929;
+        }
       }
 
       &.valid {
-        border-color: mediumseagreen;
+        &:after {
+          background-color: mediumseagreen;
+        }
       }
 
       .icon {
         display: flex;
         align-items: center;
         justify-content: center;
+        background-color: rgb(30, 30, 30);
         height: 50px;
         width: 50px;
 
@@ -82,6 +103,7 @@
         color: black;
         width: 100%;
         height: 100%;
+        padding: 0 15px;
 
         &::placeholder {
           color: rgb(150, 150, 150);
@@ -99,16 +121,16 @@
         border: none;
         font-family: inherit;
         font-size: 15px;
-        padding: 10px;
+        padding: 15px;
         border-radius: 5px;
-        background-color: #3e8f38;
-        box-shadow: 2px 2px 0 rgb(150, 150, 150);
+        background-color: rgb(60, 60, 60);
+        box-shadow: 0 0 0 rgb(150, 150, 150);
         color: white;
         font-weight: 600;
         cursor: pointer;
 
         &[disabled] {
-          background-color: grey;
+          background-color: rgb(60, 60, 60);
         }
       }
     }

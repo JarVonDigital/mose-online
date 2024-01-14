@@ -1,44 +1,79 @@
-
-<h2 class="heading">Users</h2>
+<h2 class="heading">Team</h2>
 
 <div class="users" *ngIf="user?.roles?.isDev || user?.roles?.isLead">
   <div class="user" *ngFor="let userData of users">
-    <div class="section">
-      <label>First Name</label>
-      <input type="text" [(ngModel)]="userData.firstName">
-    </div>
-    <div class="section">
-      <label>Last Name</label>
-      <input type="text" [(ngModel)]="userData.lastName">
-    </div>
-    <div class="section">
-      <label>Email</label>
-      <input type="email" disabled="true" [(ngModel)]="userData.email">
-    </div>
-    <div class="section" *ngIf="user?.roles?.isDev">
-      <label>Developer?</label>
-      <select [(ngModel)]="userData.roles.isDev">
-        <option [ngValue]="false">No</option>
-        <option [ngValue]="true">Yes</option>
-      </select>
-    </div>
-    <div class="section">
-      <label>Lead?</label>
-      <select [(ngModel)]="userData.roles.isLead">
-        <option [ngValue]="false">No</option>
-        <option [ngValue]="true">Yes</option>
-      </select>
+
+    <div class="settings">
+
+      <div class="icon-container">
+
+        <div class="icon">{{ userData.firstName[0] + userData.lastName[0] }}</div>
+
+        <div class="main-details">
+          <input type="text" [(ngModel)]="userData.firstName">
+          <input type="text" [(ngModel)]="userData.lastName">
+        </div>
+
+      </div>
+
+      <div class="section">
+        <div class="icon">
+          <img src="https://img.icons8.com/material/48/ffffff/new-post--v1.png"/>
+        </div>
+        <div class="input">
+          <input type="email" [disabled]="true" [(ngModel)]="userData.email">
+        </div>
+
+      </div>
+
+      <div class="section" *ngIf="user?.roles?.isDev">
+        <div class="icon">
+          <img width="48" height="48" src="https://img.icons8.com/material-rounded/48/ffffff/source-code.png"
+               alt="source-code"/>
+        </div>
+        <div class="input">
+          <select [(ngModel)]="userData.roles.isDev">
+            <option [ngValue]="false">No</option>
+            <option [ngValue]="true">Yes</option>
+          </select>
+        </div>
+
+      </div>
+
+      <div class="section">
+        <div class="icon">
+          <img width="96" height="96" src="https://img.icons8.com/material/96/ffffff/music-conductor.png"
+               alt="music-conductor"/>
+        </div>
+        <div class="input">
+          <select [(ngModel)]="userData.roles.isLead">
+            <option [ngValue]="false">No</option>
+            <option [ngValue]="true">Yes</option>
+          </select>
+        </div>
+
+      </div>
+
+      <div class="section">
+        <div class="icon">
+          <img width="96" height="96" src="https://img.icons8.com/material/96/ffffff/google-translate.png"
+               alt="google-translate"/>
+        </div>
+        <div class="input">
+          <select [(ngModel)]="userData.workingLanguage">
+            <option [ngValue]="'en'">English</option>
+            <option [ngValue]="'es'">Spanish</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="buttons">
+        <!-- Update Button -->
+        <button class="save" (click)="onSaveUser(userData)">Update</button>
+      </div>
+
     </div>
 
-    <div class="section">
-      <label>Working Language</label>
-      <select [(ngModel)]="userData.workingLanguage">
-        <option [ngValue]="'en'">English</option>
-        <option [ngValue]="'es'">Spanish</option>
-      </select>
-    </div>
-    <div class="section">
-      <button class="save" (click)="onSaveUser(userData)">Update User</button>
-    </div>
+
   </div>
 </div>
