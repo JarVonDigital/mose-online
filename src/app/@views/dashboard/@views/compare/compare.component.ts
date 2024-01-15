@@ -49,12 +49,10 @@ export class CompareComponent implements OnInit, OnDestroy {
 
   async ngOnInit(): Promise<void> {
 
-    this.user = this.authService.loginCreds;
+    this.user = await this.authService.getLoginUser();
     this.subtitles = await this.subtitleService.getAllSubtitles();
     this.replacers = await this.subtitleService.getAllReplacers();
     this.users = await this.authService.getUsers()
-
-    // if(this.isAutoSaving) { this.enableAutoSave() }
 
   }
 

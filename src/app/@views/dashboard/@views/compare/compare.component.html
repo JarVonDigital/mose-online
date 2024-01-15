@@ -1,16 +1,33 @@
-
 <div class="selector" *ngIf="subtitles && user">
 
   <!-- Get Training Data For Model -->
-  <li *ngIf="user.roles.isDev" (click)="onGetTrainingData()">Get Training Data</li>
+  <li *ngIf="user.roles.isDev" (click)="onGetTrainingData()">
+    <div class="icon">
+      <img width="48" height="48" src="https://img.icons8.com/material-sharp/48/chatgpt.png" alt="chatgpt"/>
+    </div>
+    <div class="info">
+      Get Training Data
+      <small>Generate OpenAI Model Data</small>
+    </div>
+  </li>
 
   <!-- Each Subtitle -->
   <li *ngFor="let subtitle of subtitles"
       (click)="onSelectSubtitleWorkingFile(subtitle)"
       [class]="{'disabled': ((!user.roles.isDev && !user.roles.isLead) && subtitle.assignedTo != user.email)}">
-    {{subtitle.title}}
-    <small *ngIf="subtitle.assignedTo">{{subtitle.assignedTo}}</small>
-    <small *ngIf="!subtitle.assignedTo">Unassigned</small>
+
+    <div class="icon">
+      <img width="96" height="96" src="https://img.icons8.com/material/96/2D2D2DFF/closed-captioning.png"
+           alt="closed-captioning"/>
+    </div>
+
+    <div class="info">
+      {{ subtitle.title }}
+      <small *ngIf="subtitle.assignedTo">{{ subtitle.assignedTo }}</small>
+      <small *ngIf="!subtitle.assignedTo">Unassigned</small>
+    </div>
+
+
   </li>
 
 </div>

@@ -6,11 +6,20 @@
   font-family: 'Varela Round', sans-serif;
 
   .selector {
-    width: 275px;
+    width: 300px;
     overflow: auto;
     background-color: rgb(45, 45, 45);
+    scroll-behavior: smooth;
+    scrollbar-width: none;  /* Firefox */
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+
 
     li {
+      display: flex;
       list-style: none;
       background-color: white;
       margin: 10px;
@@ -20,23 +29,30 @@
       border-radius: 5px;
       overflow: hidden;
 
+      .icon {
+        height: 50px;
+        width: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        img {
+          display: block;
+          height: 25px;
+          width: 25px;
+        }
+      }
+
+      .info {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        font-weight: 600;
+      }
+
       small {
         display: block;
         font-size: 11px;
-      }
-
-      select {
-        border: 0;
-        padding: 2.5px;
-        margin: 10px 0 0 0;
-        background: rgb(240, 240, 240);
-        outline: none;
-        border-radius: 0;
-        cursor: pointer;
-        font-family: inherit;
-        width: 100%;
-        font-weight: 600;
-        font-size: 12px;
       }
 
       &.disabled {
@@ -62,7 +78,6 @@
       position: sticky;
       display: flex;
       flex-direction: column;
-      border-bottom: 2px solid #774d41;
       background-color: white;
 
       .info {
@@ -91,10 +106,12 @@
               align-items: center;
               border-radius: 40px;
               overflow: hidden;
+              color: white;
+              font-weight: 600;
 
               &.prev-status {
                 .short, .long {
-                  background-color: #bfdc95;
+                  background-color: #2d2d2d;
                 }
               }
 
@@ -108,7 +125,7 @@
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                font-size: 12px;
+                font-size: 10px;
                 cursor: pointer;
 
                 height: 40px;
@@ -122,7 +139,7 @@
               }
 
               .long {
-                background: rgb(184, 246, 241);
+                background: rgb(196, 174, 87);
                 padding-right: 10px;
 
                 .details {
@@ -142,7 +159,7 @@
                   height: 40px;
                   width: 40px;
                   border-radius: 30px;
-                  background-color: rgb(158, 215, 210);
+                  background-color: rgb(60, 60, 60);
                   margin-right: 5px;
                 }
               }
@@ -158,28 +175,45 @@
             flex: 1;
             align-items: center;
             justify-content: center;
+            gap: 10px;
 
             .action {
               flex: 1;
               display: flex;
-              flex-direction: column;
+              background-color: white;
+              cursor: pointer;
 
-              label {
-                flex: 1;
-                margin: 5px 0;
-                font-size: 13px;
-                text-align: right;
+              .icon {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 40px;
+                width: 40px;
+
+                img {
+                  display: block;
+                  height: 20px;
+                  width: 20px;
+                }
               }
 
-              select, input {
-                flex: 1;
-                padding: 5px;
-                border: 1px solid rgb(230, 230, 230);
-                border-bottom: none;
-                font-family: inherit;
-                outline: none;
-                text-align: right;
+              .info {
+                select, input {
+                  flex: 1;
+                  padding: 5px;
+                  border: none;
+                  font-family: inherit;
+                  background-color: transparent;
+                  outline: none;
+                  text-align: left;
+                  cursor: pointer;
+                }
               }
+
+              &:hover {
+                background-color: rgb(240, 240, 240);
+              }
+
             }
           }
 
@@ -199,22 +233,6 @@
               cursor: pointer;
               font-family: inherit;
               max-width: 50px;
-
-              &.autosave {
-                display: block;
-
-                small {
-                  display: block;
-
-                  &.active {
-                    color: green;
-                  }
-
-                  &.inactive {
-                    color: red;
-                  }
-                }
-              }
 
               img {
                 display: block;
@@ -259,13 +277,18 @@
       overflow: auto;
 
       .video-player {
-        flex: 1;
+        flex: 2;
         display: flex;
         flex-direction: column;
+        background-color: white;
 
         video {
-          width: 100%;
+          width: calc(100% - 20px);
           height: auto;
+          border: none;
+          border-radius: 10px;
+          box-shadow: 0px 0px 10px -5px;
+          margin: 10px;
         }
       }
 
@@ -278,9 +301,7 @@
 
           .subtitle {
             flex: 1;
-            border: 2px solid grey;
             border-top: none;
-            height: 100px;
             overflow: hidden;
 
             &.valid {
@@ -317,50 +338,67 @@
               }
             }
 
-            .header {
+            .subtitle--inner-container {
               display: flex;
-              font-size: 13px;
-              font-weight: 700;
-              padding: 5px;
-              background-color: rgb(220, 220, 220);
+              flex-direction: column;
+              margin: 10px;
+              border-radius: 0 0 10px 10px;
+              box-shadow: 0px 0px 10px -5px;
+              overflow: hidden;
+              height: 150px;
+              max-height: 150px;
 
-              .info {
-                flex: 1;
+              .header {
+                display: flex;
+                font-size: 13px;
+                font-weight: 700;
+                padding: 5px;
+                background-color: rgb(60, 60, 60);
+                color: rgb(240, 240, 240);
+
+                .left {
+                  display: flex;
+                  flex: 1;
+                  justify-content: flex-start;
+                  align-items: center;
+                }
+
+                .right {
+                  display: flex;
+                  flex: 1;
+                  justify-content: flex-end;
+                  align-items: center;
+                }
+
+
               }
 
-              .live-feed {
+              .data {
+                flex: 1;
                 display: flex;
+                height: inherit;
+                font-size: 15px;
+                padding: 5px;
+                overflow: auto;
 
-                .user-img {
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  height: 20px;
-                  width: 20px;
-                  border-radius: 20px;
-                  background-color: white;
+                textarea {
+                  flex: 1;
+                  resize: none;
+                  height: 100%;
+                  width: 100%;
+                  border: none;
+                  outline: none;
+                  margin: 0;
+                  padding: 0;
+                  font-family: inherit;
+                  font-size: inherit;
+                  color: inherit;
                 }
               }
+
             }
 
-            .data {
-              height: inherit;
-              font-size: 18px;
-              padding: 5px;
 
-              textarea {
-                resize: none;
-                height: 100%;
-                width: 100%;
-                border: none;
-                outline: none;
-                margin: 0;
-                padding: 0;
-                font-family: inherit;
-                font-size: inherit;
-                color: inherit;
-              }
-            }
           }
         }
       }
